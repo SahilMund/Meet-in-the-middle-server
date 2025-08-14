@@ -7,6 +7,6 @@ export const otpSchema = new mongoose.Schema({
     default: Date.now(),
     expires: 600, // ⏱️ 600 seconds = 10 minutes
   },
-});
+},{timestamps:true});
 const Otp = mongoose.model("Otp", otpSchema);
 export default Otp;
