@@ -29,7 +29,7 @@ const sendOTP = async (req, res) => {
 
 const verifyOTP = async (req, res) => {
   try {
-    const { email, otp, password, username } = req.body;
+    const { email, otp, password, name } = req.body;
 
     // 1. Check OTP
     const otpData = await OtpModel.findOne({ email, otp });
@@ -53,7 +53,7 @@ const verifyOTP = async (req, res) => {
 
     // 4. Create user
     await UserModel.create({
-      name: username,
+      name,
       email,
       password,
     });
