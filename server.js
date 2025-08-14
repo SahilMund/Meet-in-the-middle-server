@@ -1,12 +1,14 @@
 import express from "express";
-import dotenv from "dotenv";
 import connectDB from "./src/configs/mongoose.js";
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 connectDB().then(() => {
