@@ -7,32 +7,23 @@ const isLoggedIn = async (req, res, next) => {
   if (!token) {
     return sendResponse(res, "User not authorised", 401);
   }
-
   try {
-    const decodedUser = jwt.verify(
-      token,
-      process.env.JWT_SECRET_KEY,
-      (err, decoded) => {
-        if (err) {
-          if (err.name === "TokenExpiredError") {
-            return sendResponse(res, "Token expired", 401);
-          }
-          return sendResponse(res, "User not found", 401);
-        } else {
-          return decoded;
-        }
-      }
-    );
-
-    req.user = {
-      id: decodedUser.id,
-      email: decodedUser.email,
-    };
-
-    next();
+    const secret = process.env.JWT_SECRET_KEY;
+    const decodedUser = jwt.verify(token, secret, (err, decoded) => {
+    if (err && err.name === "TokenExpiredError") {
+      return sendResponse(res, "User Token Expired", 401, null);
+    }
+    if (err) {
+      return sendResponse(res, "Invalid User Token", 401, null);
+    }
+    return decoded;
+  });
+  req.user = decodedUser;
+  next();
   } catch (err) {
     return sendResponse(res, "Invalid or expired token", 401);
   }
+
 };
 
 export default isLoggedIn;

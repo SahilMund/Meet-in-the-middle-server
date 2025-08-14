@@ -1,15 +1,53 @@
+
 import express from "express";
-import jwt from "jsonwebtoken";
 const router = express.Router();
 import User from "../models/user.model.js";
+import jwt from "jsonwebtoken";
 import sendResponse from "../utils/response.util.js";
+import fs from "fs";
+import path from "path";
+import sharp from "sharp";
+import { fileURLToPath } from "url";
+
+
+
+export const getUserInfo = async (req, res) => {
+  // Assuming req.user is set by the isLoggedIn middleware
+  if (!req.user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  // Return user information
+  return sendResponse(res,"user info fetched successfully",200,{
+    id: req.user.id,
+    email: req.user.email,
+    role: req.user.role, // Assuming role is part of the user object
+  });
+};
+
+
+export const logout = async (req, res) => {
+  try {
+    const options = {
+      httpOnly: true,
+      // secure: true, //uncomment before deployment
+    };
+    res.cookie("token", "", options);
+
+    return sendResponse(res, "User logged out successfully", 200);
+  } catch (error) {
+    sendResponse(res, "Something went wrong", 500);
+  }
+};
+
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
 
-    if (!user || (await user.comparePassword(password))) {
+    if (!user || !(await user.comparePassword(password))) {
+
       return sendResponse(res, "Invalid credentials", 401);
     }
 
@@ -19,19 +57,23 @@ export const login = async (req, res) => {
         email: user.email,
       },
       process.env.JWT_SECRET_KEY,
-      { expiresIn:  process.env.JWT_EXPIRY }
+
+      { expiresIn: process.env.JWT_EXPIRY }
+
     );
     const options = {
       httpOnly: true,
       // secure: true, //uncomment before deployment
     };
-    
-    res.cookie("token", token, options);
-
-    return sendResponse(res, "User logged in Successfully", 200,{ user, token });
+res.cookie("token", token, options);
+  return sendResponse(res, "User logged in Successfully", 200, {
+      email: user.email,
+      role: user.role,
+      name:user.name,
+      token,
+    });
   } catch (error) {
     sendResponse(res, "Something went wrong", 500);
-  }
 };
 
 
@@ -50,14 +92,40 @@ export const logout = async (req, res) => {
   }
 };
 
-export const loggedInUserInfo = async (req, res) => {
+
+//This is for user avatar
+export const uploadToDiskStoarge = async (req, res) => {
   try {
-    const user = await User.findOne({ _id: req?.user?.id});
-    sendResponse(res,"logged in user info",200,{
-        user: req.user,
-      });
+    
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    console.log("the file path", req.file.buffer);
+    const uploadDir = path.join(__dirname, "../uploads");
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir);
+    }
+    const resizedFileName = `resized-${Date.now()}.jpeg`;
+    const resizedFilePath = path.join(uploadDir, resizedFileName);
+    await sharp(req.file.buffer)
+      .resize(500, 500)
+      .toFormat("jpeg")
+      .toFile(resizedFilePath);
+
+    // Create response object
+    const data = {
+      resized: {
+        filename: resizedFileName,
+        path: resizedFilePath,
+        size: fs.statSync(resizedFilePath).size,
+      },
+    };
+
+    res.status(200).json(data);
   } catch (error) {
-    sendResponse(res,"user not found",400);
+    console.error(error);
+    res.status(500).json({ error: "File upload failed" });
+
   }
 };
 
