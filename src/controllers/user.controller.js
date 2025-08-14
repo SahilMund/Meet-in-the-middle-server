@@ -12,25 +12,52 @@ export const login = async (req, res) => {
     if (!user || (await user.comparePassword(password))) {
       return sendResponse(res, "Invalid credentials", 401);
     }
+
     const token = jwt.sign(
       {
         id: user._id,
         email: user.email,
-        name: user.name,
       },
-      process.env.SECRET_KEY,
-      { expiresIn: "7d" }
+      process.env.JWT_SECRET_KEY,
+      { expiresIn:  process.env.JWT_EXPIRY }
     );
     const options = {
       httpOnly: true,
-      // secure: true,//uncomment before deployment
+      // secure: true, //uncomment before deployment
     };
-    res.status(200).cookie("token", token, options).json({
-      message: "User logged in Successfully",
-      data: { user, token },
-      success: true,
-    });
+    
+    res.cookie("token", token, options);
+
+    return sendResponse(res, "User logged in Successfully", 200,{ user, token });
   } catch (error) {
     sendResponse(res, "Something went wrong", 500);
   }
 };
+
+
+export const logout = async (req, res) => {
+ 
+  try {
+    const options = {
+      httpOnly: true,
+      // secure: true, //uncomment before deployment
+    };
+     res.cookie("token", "", options);
+
+    return sendResponse(res, "User logged out successfully", 200);
+  } catch (error) {
+    sendResponse(res, "Something went wrong", 500);
+  }
+};
+
+export const loggedInUserInfo = async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req?.user?.id});
+    sendResponse(res,"logged in user info",200,{
+        user: req.user,
+      });
+  } catch (error) {
+    sendResponse(res,"user not found",400);
+  }
+};
+
