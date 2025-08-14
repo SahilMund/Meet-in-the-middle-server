@@ -1,14 +1,65 @@
+import User from "../models/user.model.js";
+import jwt from "jsonwebtoken";
 
+import sendResponse from "../utils/response.util.js";
 export const getUserInfo = async (req, res) => {
-    // Assuming req.user is set by the isLoggedIn middleware
-    if (!req.user) {
-        return res.status(401).json({ message: "Unauthorized" });
+  // Assuming req.user is set by the isLoggedIn middleware
+  if (!req.user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  // Return user information
+  return res.status(200).json({
+    id: req.user.id,
+    email: req.user.email,
+    role: req.user.role, // Assuming role is part of the user object
+  });
+};
+
+export const logout = async (req, res) => {
+  try {
+    const options = {
+      httpOnly: true,
+      // secure: true, //uncomment before deployment
+    };
+    res.cookie("token", "", options);
+
+    return sendResponse(res, "User logged out successfully", 200);
+  } catch (error) {
+    sendResponse(res, "Something went wrong", 500);
+  }
+};
+
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user || !(await user.comparePassword(password))) {
+      return sendResponse(res, "Invalid credentials", 401);
     }
-    
-    // Return user information
-    return res.status(200).json({
-        id: req.user.id,
-        email: req.user.email,
-        role: req.user.role, // Assuming role is part of the user object
+
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+      },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: process.env.JWT_EXPIRY }
+    );
+    const options = {
+      httpOnly: true,
+      // secure: true, //uncomment before deployment
+    };
+
+    res.cookie("token", token, options);
+
+    return sendResponse(res, "User logged in Successfully", 200, {
+      email: user.email,
+      role: user.role,
+      name:user.name,
+      token,
     });
-}
+  } catch (error) {
+    sendResponse(res, "Something went wrong", 500);
+  }
+};
