@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 8000;
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use("/api/user", userRoutes);
 app.use(
   cors({
     origin: "*", // Allow all origins, change origins if needed
@@ -26,9 +27,11 @@ connectDB().then(() => {
 });
 
 
+
 app.use('/api/user', userRoutes);
 
-app.use('/api/verification', verificationRoutes);
+
+app.use("/api/verification", verificationRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

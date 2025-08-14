@@ -1,7 +1,15 @@
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
-
 import sendResponse from "../utils/response.util.js";
+// import sendResponse from "../utils/response.util";
+import fs from "fs";
+import path from "path";
+import sharp from "sharp";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export const getUserInfo = async (req, res) => {
   // Assuming req.user is set by the isLoggedIn middleware
   if (!req.user) {
@@ -15,6 +23,7 @@ export const getUserInfo = async (req, res) => {
     role: req.user.role, // Assuming role is part of the user object
   });
 };
+
 
 export const logout = async (req, res) => {
   try {
@@ -61,5 +70,35 @@ export const login = async (req, res) => {
     });
   } catch (error) {
     sendResponse(res, "Something went wrong", 500);
+
+//This is for user avatar
+export const uploadToDiskStoarge = async (req, res) => {
+  try {
+    console.log("the file path", req.file.buffer);
+    const uploadDir = path.join(__dirname, "../uploads");
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir);
+    }
+    const resizedFileName = `resized-${Date.now()}.jpeg`;
+    const resizedFilePath = path.join(uploadDir, resizedFileName);
+    await sharp(req.file.buffer)
+      .resize(500, 500)
+      .toFormat("jpeg")
+      .toFile(resizedFilePath);
+
+    // Create response object
+    const data = {
+      resized: {
+        filename: resizedFileName,
+        path: resizedFilePath,
+        size: fs.statSync(resizedFilePath).size,
+      },
+    };
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "File upload failed" });
+
   }
 };
