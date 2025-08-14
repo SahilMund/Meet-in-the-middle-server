@@ -2,18 +2,19 @@ import jwt from "jsonwebtoken";
 import sendResponse from "../utils/response.util.js";
 
 const isLoggedIn = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  const token = req.cookies.token;
 
-  if (!authHeader) {
+  if (!token) {
     return sendResponse(res, "User Token Not Found", 400, null);
   }
-  const token = authHeader.split(" ")[1];
-  const secret = process.env.SECRET_KEY;
+  const secret = process.env.JWT_SECRET_KEY;
   const decodedUser = jwt.verify(token, secret, (err, decoded) => {
     if (err && err.name === "TokenExpiredError") {
       return sendResponse(res, "User Token Expired", 401, null);
     }
     if (err) {
+      console.error("Token verification error:", err);
+      console.log(decoded)
       return sendResponse(res, "Invalid User Token", 401, null);
     }
     return decoded;
