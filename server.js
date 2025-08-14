@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 8000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use("/api/user", userRoutes);
 app.use(
   cors({
     origin: "*", // Allow all origins, change origins if needed
@@ -23,13 +24,12 @@ connectDB().then(() => {
   console.log("✅ MongoDB Connected Successfully");
 });
 
-
-app.use('/api/user', userRoutes);
+app.use("/api/user", userRoutes);
 app.get("/", (req, res) => {
   res.send("API is working!");
 });
 
-app.use('/api/verification', verificationRoutes);
+app.use("/api/verification", verificationRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
