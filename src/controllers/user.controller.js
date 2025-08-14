@@ -1,14 +1,52 @@
+// import sendResponse from "../utils/response.util";
+import fs from "fs";
+import path from "path";
+import sharp from "sharp";
+import { fileURLToPath } from "url";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 export const getUserInfo = async (req, res) => {
-    // Assuming req.user is set by the isLoggedIn middleware
-    if (!req.user) {
-        return res.status(401).json({ message: "Unauthorized" });
+  // Assuming req.user is set by the isLoggedIn middleware
+  if (!req.user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  // Return user information
+  return res.status(200).json({
+    id: req.user.id,
+    email: req.user.email,
+    role: req.user.role, // Assuming role is part of the user object
+  });
+};
+
+//This is for user avatar
+export const uploadToDiskStoarge = async (req, res) => {
+  try {
+    console.log("the file path", req.file.buffer);
+    const uploadDir = path.join(__dirname, "../uploads");
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir);
     }
-    
-    // Return user information
-    return res.status(200).json({
-        id: req.user.id,
-        email: req.user.email,
-        role: req.user.role, // Assuming role is part of the user object
-    });
-}
+    const resizedFileName = `resized-${Date.now()}.jpeg`;
+    const resizedFilePath = path.join(uploadDir, resizedFileName);
+    await sharp(req.file.buffer)
+      .resize(500, 500)
+      .toFormat("jpeg")
+      .toFile(resizedFilePath);
+
+    // Create response object
+    const data = {
+      resized: {
+        filename: resizedFileName,
+        path: resizedFilePath,
+        size: fs.statSync(resizedFilePath).size,
+      },
+    };
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "File upload failed" });
+  }
+};
