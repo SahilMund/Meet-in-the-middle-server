@@ -1,7 +1,6 @@
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import sendResponse from "../utils/response.util.js";
-// import sendResponse from "../utils/response.util";
 import fs from "fs";
 import path from "path";
 import sharp from "sharp";
@@ -23,7 +22,6 @@ export const getUserInfo = async (req, res) => {
     role: req.user.role, // Assuming role is part of the user object
   });
 };
-
 
 export const logout = async (req, res) => {
   try {
@@ -52,7 +50,7 @@ export const login = async (req, res) => {
         id: user._id,
         email: user.email,
       },
-      process.env.JWT_SECRET_KEY,
+      process.env.JWT_SECRET_KEY, 
       { expiresIn: process.env.JWT_EXPIRY }
     );
     const options = {
@@ -65,19 +63,21 @@ export const login = async (req, res) => {
     return sendResponse(res, "User logged in Successfully", 200, {
       email: user.email,
       role: user.role,
-      name:user.name,
+      name: user.name,
       token,
     });
   } catch (error) {
+    console.log(error)
     sendResponse(res, "Something went wrong", 500);
+  }
+};
 
 //This is for user avatar
 export const uploadToDiskStoarge = async (req, res) => {
   try {
-    console.log("the file path", req.file.buffer);
-    const uploadDir = path.join(__dirname, "../uploads");
+    const uploadDir = path.join(__dirname, "../uploads",req.user.id);
     if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir);
+      fs.mkdirSync(uploadDir, { recursive: true });
     }
     const resizedFileName = `resized-${Date.now()}.jpeg`;
     const resizedFilePath = path.join(uploadDir, resizedFileName);
@@ -99,6 +99,5 @@ export const uploadToDiskStoarge = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "File upload failed" });
-
   }
 };

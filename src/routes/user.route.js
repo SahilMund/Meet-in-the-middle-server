@@ -13,7 +13,7 @@ router.post('/login', login);
 router.post('/logout', isLoggedIn, logout);
 router.get('/currUserInfo',isLoggedIn, getUserInfo);
 
-router.post("/upload/disk", upload.single("image"), uploadToDiskStoarge);
+router.post("/uploadAvatar",isLoggedIn, upload.single("image"), uploadToDiskStoarge);
 
 
 export default router;
