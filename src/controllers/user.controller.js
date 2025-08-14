@@ -1,14 +1,13 @@
+
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import sendResponse from "../utils/response.util.js";
-// import sendResponse from "../utils/response.util";
 import fs from "fs";
 import path from "path";
 import sharp from "sharp";
 import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+
 
 export const getUserInfo = async (req, res) => {
   // Assuming req.user is set by the isLoggedIn middleware
@@ -17,7 +16,7 @@ export const getUserInfo = async (req, res) => {
   }
 
   // Return user information
-  return res.status(200).json({
+  return sendResponse(res,"user info fetched successfully",200,{
     id: req.user.id,
     email: req.user.email,
     role: req.user.role, // Assuming role is part of the user object
@@ -74,6 +73,10 @@ export const login = async (req, res) => {
 //This is for user avatar
 export const uploadToDiskStoarge = async (req, res) => {
   try {
+    
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
     console.log("the file path", req.file.buffer);
     const uploadDir = path.join(__dirname, "../uploads");
     if (!fs.existsSync(uploadDir)) {
