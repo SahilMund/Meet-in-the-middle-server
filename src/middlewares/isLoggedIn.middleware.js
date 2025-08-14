@@ -1,25 +1,32 @@
 import jwt from "jsonwebtoken";
-import User from "../models/user.model.js";
+import sendResponse from "../utils/response.util.js";
 
 const isLoggedIn = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.status(500).json({
-      data: null,
-      message: "User not authorised",
-      success: false,
-    });
+    return sendResponse(res, "User Token Not Found", 400, null);
   }
   const token = authHeader.split(" ")[1];
   const secret = process.env.SECRET_KEY;
-  const decodedUser = jwt.verify(token, secret);
-  const user = await User.findOne({ _id: decodedUser?.id });
-  req.user = {
-    id: decodedUser?.id,
-    email: decodedUser?.email,
-    role: user?.role ?? "personal",
-  };
+  const decodedUser = jwt.verify(token, secret, (err, decoded) => {
+    if (err && err.name === "TokenExpiredError") {
+      return sendResponse(res, "User Token Expired", 401, null);
+    }
+    if (err) {
+      return sendResponse(res, "Invalid User Token", 401, null);
+    }
+    return decoded;
+  });
+  // const user = await User.findOne({ _id: decodedUser?.id });
+  // It takes some waiting time to get the user from the database
+  // so we can store the all the required user data in the token itself
+  // req.user = {
+  //   id: decodedUser?.id,
+  //   email: decodedUser?.email,
+  //   role: user.role,
+  // };
+  req.user = decodedUser;
   next();
 };
 export default isLoggedIn;
