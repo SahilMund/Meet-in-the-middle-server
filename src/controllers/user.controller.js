@@ -5,9 +5,7 @@ import fs from "fs";
 import path from "path";
 import sharp from "sharp";
 import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import cloudinary from "../configs/cloudinary.js";
 
 export const getUserInfo = async (req, res) => {
   // Assuming req.user is set by the isLoggedIn middleware
@@ -33,7 +31,7 @@ export const logout = async (req, res) => {
 
     return sendResponse(res, "User logged out successfully", 200);
   } catch (error) {
-    sendResponse(res, "Something went wrong", 500);
+    return sendResponse(res, "Something went wrong", 500);
   }
 };
 
@@ -50,7 +48,7 @@ export const login = async (req, res) => {
         id: user._id,
         email: user.email,
       },
-      process.env.JWT_SECRET_KEY, 
+      process.env.JWT_SECRET_KEY,
       { expiresIn: process.env.JWT_EXPIRY }
     );
     const options = {
@@ -67,15 +65,16 @@ export const login = async (req, res) => {
       token,
     });
   } catch (error) {
-    console.log(error)
-    sendResponse(res, "Something went wrong", 500);
+    return sendResponse(res, "Something went wrong", 500);
   }
 };
 
 //This is for user avatar
 export const uploadToDiskStoarge = async (req, res) => {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
   try {
-    const uploadDir = path.join(__dirname, "../uploads",req.user.id);
+    const uploadDir = path.join(__dirname, "../uploads", req.user.id);
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
@@ -95,7 +94,7 @@ export const uploadToDiskStoarge = async (req, res) => {
       },
     };
 
-    res.status(200).json(data);
+    sendResponse(res, "File uploaded successfully", 200, data);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "File upload failed" });

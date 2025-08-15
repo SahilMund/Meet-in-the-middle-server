@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import userRoutes from "./src/routes/user.route.js";
 import connectDB from "./src/configs/mongoose.js";
 import verificationRoutes from "./src/routes/verificationOTP.route.js";
+import cloudinary from "./src/configs/cloudinary.js";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
