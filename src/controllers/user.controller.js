@@ -6,6 +6,7 @@ import path from "path";
 import sharp from "sharp";
 import { fileURLToPath } from "url";
 import cloudinary from "../configs/cloudinary.js";
+import { deleteAvatarFromCloudinary } from "../utils/deleteUserAvatarFromCloudinary.js";
 
 export const getUserInfo = async (req, res) => {
   // Assuming req.user is set by the isLoggedIn middleware
@@ -73,7 +74,7 @@ export const login = async (req, res) => {
   }
 };
 
-//This is for user avatar
+//This is for user avatar upload new for first time
 export const uploadToDiskStoarge = async (req, res) => {
   if (!req.file) {
     return sendResponse(res, "No file uploaded");
@@ -102,7 +103,7 @@ export const uploadToDiskStoarge = async (req, res) => {
 
     // Step 4: Delete local file after successful upload and flolder cleanup
     fs.unlinkSync(resizedFilePath);
-    fs.rmdirSync(uploadDir, { recursive: true });
+    fs.rmSync(uploadDir, { recursive: true });
 
     // Step 5: Send response with Cloudinary info
     const data = {
@@ -114,6 +115,9 @@ export const uploadToDiskStoarge = async (req, res) => {
         format: cloudinaryResult.format,
       },
     };
+    let user = await User.findById(req.user.id);
+    let oldAvatar = user.avatar;
+    
     User.findByIdAndUpdate(req.user.id, {
       avatar: data.cloudinary.url,
     })
@@ -123,10 +127,41 @@ export const uploadToDiskStoarge = async (req, res) => {
       .catch((error) => {
         console.error("Error updating user avatar:", error);
       });
-
-    sendResponse(res, "File uploaded successfully", 200, data);
+    // If there is an old avatar, delete it
+    if (oldAvatar) {
+    deleteAvatarFromCloudinary(oldAvatar)
+      .then(() => {
+        console.log("Old avatar deleted successfully");
+      })
+      .catch((error) => {
+        console.error("Error deleting old avatar:", error);
+      });
+    }
+    return sendResponse(res, "File uploaded successfully", 200, data);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "File upload failed" });
+  }
+};
+
+//delete user avatar
+export const deleteUserAvatar = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user || !user.avatar) {
+      return sendResponse(res, "No avatar found for this user", 404);
+    }
+    // Delete the avatar from Cloudinary
+    const publicId = user.avatar.split("/").pop().split(".")[0]; // Extract public_id from URL
+    await cloudinary.uploader.destroy(publicId, {
+      resource_type: "image",
+    });
+    // Update user document to remove avatar
+    user.avatar = "";
+    await user.save();
+    return sendResponse(res, "User avatar deleted successfully", 200);
+  } catch (error) {
+    console.error("Error deleting user avatar:", error);
+    return sendResponse(res, "Failed to delete user avatar", 500);
   }
 };
