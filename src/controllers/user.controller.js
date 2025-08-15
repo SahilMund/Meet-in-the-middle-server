@@ -12,12 +12,15 @@ export const getUserInfo = async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ message: "Unauthorized" });
   }
+  const { email } = req.user;
+  const user = await User.findOne({ email });
 
   // Return user information
-  return res.status(200).json({
-    id: req.user.id,
-    email: req.user.email,
-    role: req.user.role, // Assuming role is part of the user object
+  return sendResponse(res, "User logged in Successfully", 200, {
+    email: user.email,
+    role: user.role,
+    name: user.name,
+    avartar: user.avatar,
   });
 };
 
@@ -62,6 +65,7 @@ export const login = async (req, res) => {
       email: user.email,
       role: user.role,
       name: user.name,
+      avartar: user.avatar,
       token,
     });
   } catch (error) {
@@ -71,28 +75,53 @@ export const login = async (req, res) => {
 
 //This is for user avatar
 export const uploadToDiskStoarge = async (req, res) => {
+  if (!req.file) {
+    return sendResponse(res, "No file uploaded");
+  }
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   try {
+    //step 1: Check if file is provided
     const uploadDir = path.join(__dirname, "../uploads", req.user.id);
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
     const resizedFileName = `resized-${Date.now()}.jpeg`;
     const resizedFilePath = path.join(uploadDir, resizedFileName);
+    // Step 2: Resize the image using sharp
     await sharp(req.file.buffer)
       .resize(500, 500)
       .toFormat("jpeg")
       .toFile(resizedFilePath);
 
-    // Create response object
+    // Step 3: Upload to Cloudinary
+    const cloudinaryResult = await cloudinary.uploader.upload(resizedFilePath, {
+      folder: `user_uploads/${req.user.id}`, // Optional folder in Cloudinary
+      resource_type: "image",
+    });
+
+    // Step 4: Delete local file after successful upload
+    fs.unlinkSync(resizedFilePath);
+
+    // Step 5: Send response with Cloudinary info
     const data = {
-      resized: {
-        filename: resizedFileName,
-        path: resizedFilePath,
-        size: fs.statSync(resizedFilePath).size,
+      cloudinary: {
+        url: cloudinaryResult.secure_url,
+        public_id: cloudinaryResult.public_id,
+        width: cloudinaryResult.width,
+        height: cloudinaryResult.height,
+        format: cloudinaryResult.format,
       },
     };
+    User.findByIdAndUpdate(req.user.id, {
+      avatar: data.cloudinary.url,
+    })
+      .then(() => {
+        console.log("User avatar updated successfully");
+      })
+      .catch((error) => {
+        console.error("Error updating user avatar:", error);
+      });
 
     sendResponse(res, "File uploaded successfully", 200, data);
   } catch (error) {
