@@ -12,12 +12,15 @@ export const getUserInfo = async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ message: "Unauthorized" });
   }
+  const { email } = req.user;
+  const user = await User.findOne({ email });
 
   // Return user information
-  return res.status(200).json({
-    id: req.user.id,
-    email: req.user.email,
-    role: req.user.role, // Assuming role is part of the user object
+  return sendResponse(res, "User logged in Successfully", 200, {
+    email: user.email,
+    role: user.role,
+    name: user.name,
+    avartar: user.avatar,
   });
 };
 
@@ -62,6 +65,7 @@ export const login = async (req, res) => {
       email: user.email,
       role: user.role,
       name: user.name,
+      avartar: user.avatar,
       token,
     });
   } catch (error) {
@@ -84,7 +88,7 @@ export const uploadToDiskStoarge = async (req, res) => {
     }
     const resizedFileName = `resized-${Date.now()}.jpeg`;
     const resizedFilePath = path.join(uploadDir, resizedFileName);
-    // Step 2: Resize the image using sharp    
+    // Step 2: Resize the image using sharp
     await sharp(req.file.buffer)
       .resize(500, 500)
       .toFormat("jpeg")
@@ -109,6 +113,15 @@ export const uploadToDiskStoarge = async (req, res) => {
         format: cloudinaryResult.format,
       },
     };
+    User.findByIdAndUpdate(req.user.id, {
+      avatar: data.cloudinary.url,
+    })
+      .then(() => {
+        console.log("User avatar updated successfully");
+      })
+      .catch((error) => {
+        console.error("Error updating user avatar:", error);
+      });
 
     sendResponse(res, "File uploaded successfully", 200, data);
   } catch (error) {
