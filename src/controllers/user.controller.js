@@ -100,8 +100,9 @@ export const uploadToDiskStoarge = async (req, res) => {
       resource_type: "image",
     });
 
-    // Step 4: Delete local file after successful upload
+    // Step 4: Delete local file after successful upload and flolder cleanup
     fs.unlinkSync(resizedFilePath);
+    fs.rmdirSync(uploadDir, { recursive: true });
 
     // Step 5: Send response with Cloudinary info
     const data = {
