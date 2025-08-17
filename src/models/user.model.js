@@ -18,13 +18,19 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
-      default:'' // cloudinary url
+      default: "", // cloudinary url
     },
     role: {
       type: String,
       enum: ["personal", "creator", "admin"],
       default: "personal",
     },
+    isOAuth: {
+      type: Boolean,
+      default: false,
+    },
+    authProvider: String,
+    profilePic: String,
   },
   { timestamps: true }
 );

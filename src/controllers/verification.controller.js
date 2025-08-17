@@ -1,4 +1,4 @@
-import { sendVerificationEmail } from "../utils/sendMail.util.js";
+import { sendVerificationEmail, sendWelcomeEmail } from "../utils/sendMail.util.js";
 import OtpModel from "../models/otp.model.js";
 import UserModel from "../models/user.model.js";
 
@@ -32,6 +32,7 @@ const verifyOTP = async (req, res) => {
     const { email, otp, password, name } = req.body;
 
     // 1. Check OTP
+    console.log(email, otp, password, name); 
     const otpData = await OtpModel.findOne({ email, otp });
     if (!otpData) {
       return res.status(400).json({ message: "Invalid OTP" });
@@ -61,7 +62,8 @@ const verifyOTP = async (req, res) => {
     // 5. Delete OTP after verification
     await OtpModel.deleteOne({ email });
     console.log("OTP deleted successfully");
-
+    // 6. Send welcome email
+    await sendWelcomeEmail(email);
     res.status(200).json({ message: "OTP verified successfully" });
   } catch (error) {
     console.error("Error verifying OTP:", error);
