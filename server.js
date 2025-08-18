@@ -1,7 +1,8 @@
-import express from "express";
-import connectDB from "./src/configs/mongoose.js";
-import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
+import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
+import express from 'express';
+
+import connectDB from './src/configs/mongoose.js';
 
 dotenv.config();
 
@@ -12,11 +13,11 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 connectDB().then(() => {
-  console.log("✅ MongoDB Connected Successfully");
+  console.log('✅ MongoDB Connected Successfully');
 });
 
-app.get("/", (req, res) => {
-  res.send("API is working!");
+app.get('/', (req, res) => {
+  res.send('API is working!');
 });
 
 app.listen(PORT, () => {

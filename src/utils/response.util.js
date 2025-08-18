@@ -1,6 +1,6 @@
 const sendResponse = (
   res,
-  message = "Success",
+  message = 'Success',
   statusCode = 200,
   data = null
 ) => {
