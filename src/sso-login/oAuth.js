@@ -18,26 +18,26 @@ const verifyCb = async (accessToken, refreshToken, profile, done) => {
       profile.photos && profile.photos.length > 0
         ? profile.photos[0].value
         : "";
-    console.log("profile", profile);
-    // const user = await User.findOne({ email: profile.email[0].value });
+
+    console.log("🔥 Google/Facebook profile:", profile);
+
     let user = await User.findOne({ email });
     if (!user) {
       user = await User.create({
         email,
         name,
-        password,
         avatar,
         isOAuth: true,
-        authProvider,
-        
+        authProvider: profile.provider, // "google" or "facebook"
       });
     }
     done(null, user);
   } catch (error) {
-    console.log(error);
+    console.error("Error in verifyCb:", error);
     done(error, null);
   }
 };
+
 // google auth
 console.log(process.env.GOOGLE_CLIENTID, process.env.GOOGLE_CLIENTSECRET, process.env.GOOGLE_CALLBACK);
 passport.use(

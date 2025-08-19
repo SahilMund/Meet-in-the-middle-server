@@ -31,19 +31,7 @@ connectDB().then(() => {
   console.log("✅ MongoDB Connected Successfully");
 });
 
-// session MUST come before passport
-app.use(
-  session({
-    secret: "123abcxyz",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: false, // true if HTTPS
-      maxAge: 1000 * 60 * 60 * 24,
-    },
-  })
-);
-
+app.use(session({ secret: "123abcxyz", resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
