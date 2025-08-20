@@ -10,6 +10,9 @@ import verificationRoutes from "./src/routes/verificationOTP.route.js";
 import cloudinary from "./src/configs/cloudinary.js";
 import { logger } from "./src/middlewares/logger.js";
 
+// import User from "./src/models/user.model.js"; 
+// User.deleteMany().then() //deleting users to recreate all again
+
 const app = express();
 const PORT = process.env.PORT || 8000;
 
@@ -18,9 +21,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "*", // Allow all origins, change origins if needed
+    origin: process.env.FRONTEND_URL, // 👈 frontend URL
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // 👈 allow credentials (cookies, auth headers)
   })
 );
 connectDB().then(() => {

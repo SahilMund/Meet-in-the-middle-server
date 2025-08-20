@@ -5,7 +5,7 @@ const isLoggedIn = async (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
-    return sendResponse(res, "User Token Not Found", 400, null);
+    return sendResponse(res, "User Token Not Found", 401, null);
   }
   const secret = process.env.JWT_SECRET_KEY;
   const decodedUser = jwt.verify(token, secret, (err, decoded) => {
