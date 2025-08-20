@@ -1,21 +1,15 @@
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import dotenv from 'dotenv';
+dotenv.config();
 import express from 'express';
 
 import connectDB from './src/configs/mongoose.js';
-import express from "express";
-import dotenv from "dotenv";
-dotenv.config();
-import cors from "cors";
-import cookieParser from "cookie-parser";
+import { logger } from './src/middlewares/logger.js';
+import userRoutes from './src/routes/user.route.js';
+import verificationRoutes from './src/routes/verificationOTP.route.js';
 
-import userRoutes from "./src/routes/user.route.js";
-import connectDB from "./src/configs/mongoose.js";
-import verificationRoutes from "./src/routes/verificationOTP.route.js";
-import cloudinary from "./src/configs/cloudinary.js";
-import { logger } from "./src/middlewares/logger.js";
-
-// import User from "./src/models/user.model.js"; 
+// import User from "./src/models/user.model.js";
 // User.deleteMany().then() //deleting users to recreate all again
 
 const app = express();
@@ -27,8 +21,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: process.env.FRONTEND_URL, // 👈 frontend URL
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true, // 👈 allow credentials (cookies, auth headers)
   })
 );
@@ -42,10 +36,8 @@ app.get('/', (req, res) => {
 
 app.use(logger); // Use logger middleware for logging requests
 
-
 app.use('/api/user', userRoutes);
-app.use("/api/verification", verificationRoutes);
-
+app.use('/api/verification', verificationRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

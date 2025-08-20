@@ -199,5 +199,4 @@ const welCOmeMail = () => `
 </html>
 `;
 
-export { welCOmeMail,html };
-
+export { welCOmeMail, html };
