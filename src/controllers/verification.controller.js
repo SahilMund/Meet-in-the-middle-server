@@ -1,6 +1,6 @@
-import OtpModel from '../models/otp.model.js';
-import UserModel from '../models/user.model.js';
-import { sendWelComeMail } from '../utils/sendMail.util.js';
+import OtpModel from "../models/otp.model.js";
+import UserModel from "../models/user.model.js";
+import { sendWelComeMail } from "../utils/sendMail.util.js";
 
 const sendOTP = async (req, res) => {
   try {
@@ -21,9 +21,9 @@ const sendOTP = async (req, res) => {
       console.log({ otpData });
     }
 
-    res.status(201).json({ message: 'OTP sent successfully' });
+    res.status(201).json({ message: "OTP sent successfully" });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to send OTP', error });
+    res.status(500).json({ message: "Failed to send OTP", error });
   }
 };
 
@@ -35,7 +35,7 @@ const verifyOTP = async (req, res) => {
     const otpData = await OtpModel.findOne({ email, otp });
     console.log(otpData);
     if (!otpData) {
-      return res.status(400).json({ message: 'Invalid OTP' });
+      return res.status(400).json({ message: "Invalid OTP" });
     }
 
     // 2. Check expiry
@@ -43,13 +43,13 @@ const verifyOTP = async (req, res) => {
     const otpTime = otpData.createdAt;
     const timeDiff = (currentTime - otpTime) / 1000; // seconds
     if (timeDiff > 1000) {
-      return res.status(400).json({ message: 'OTP expired' });
+      return res.status(400).json({ message: "OTP expired" });
     }
 
     // 3. Check if user already exists
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'Email already exists' });
+      return res.status(400).json({ message: "Email already exists" });
     }
 
     // 4. Create user
@@ -61,12 +61,12 @@ const verifyOTP = async (req, res) => {
 
     // 5. Delete OTP after verification
     await OtpModel.deleteOne({ email });
-    console.log('OTP deleted successfully');
+    console.log("OTP deleted successfully");
     await sendWelComeMail(email);
-    res.status(200).json({ message: 'OTP verified successfully' });
+    res.status(200).json({ message: "OTP verified successfully" });
   } catch (error) {
-    console.error('Error verifying OTP:', error);
-    res.status(500).json({ message: 'Failed to verify OTP', error });
+    console.error("Error verifying OTP:", error);
+    res.status(500).json({ message: "Failed to verify OTP", error });
   }
 };
 

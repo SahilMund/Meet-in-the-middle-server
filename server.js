@@ -1,13 +1,13 @@
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
-import dotenv from 'dotenv';
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import dotenv from "dotenv";
 dotenv.config();
-import express from 'express';
+import express from "express";
 
-import connectDB from './src/configs/mongoose.js';
-import { logger } from './src/middlewares/logger.js';
-import userRoutes from './src/routes/user.route.js';
-import verificationRoutes from './src/routes/verificationOTP.route.js';
+import connectDB from "./src/configs/mongoose.js";
+import { logger } from "./src/middlewares/logger.js";
+import routes from "./src/routes/index.js";
+import verificationRoutes from "./src/routes/verificationOTP.route.js";
 
 // import User from "./src/models/user.model.js";
 // User.deleteMany().then() //deleting users to recreate all again
@@ -21,23 +21,23 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: process.env.FRONTEND_URL, // 👈 frontend URL
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true, // 👈 allow credentials (cookies, auth headers)
   })
 );
 connectDB().then(() => {
-  console.log('✅ MongoDB Connected Successfully');
+  console.log("✅ MongoDB Connected Successfully");
 });
 
-app.get('/', (req, res) => {
-  res.send('API is working!');
+app.get("/", (req, res) => {
+  res.send("API is working!");
 });
 
 app.use(logger); // Use logger middleware for logging requests
 
-app.use('/api/user', userRoutes);
-app.use('/api/verification', verificationRoutes);
+app.use("/api", routes);
+app.use("/api/verification", verificationRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
