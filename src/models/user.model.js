@@ -9,16 +9,16 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: [true, "Email is required"],
-      unique: [true, "Email already exists"],
+      required: [true, 'Email is required'],
+      unique: [true, 'Email already exists'],
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: [true, 'Password is required'],
     },
     avatar: {
       type: String,
-      default:'' // cloudinary url
+      default: '', // cloudinary url
     },
     role: {
       type: String,

@@ -34,7 +34,6 @@ const isLoggedIn = async (req, res, next) => {
   } catch (err) {
     return sendResponse(res, 'Invalid or expired token', 401);
   }
-
 };
 
 export default isLoggedIn;
