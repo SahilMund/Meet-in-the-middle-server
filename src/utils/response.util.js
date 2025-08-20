@@ -10,4 +10,5 @@ const sendResponse = (
     data,
   });
 };
+
 export default sendResponse;
