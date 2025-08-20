@@ -1,7 +1,7 @@
 const sendResponse = (
   res,
-  message = "Success",
-  statusCode = 400,
+  message = 'Success',
+  statusCode = 200,
   data = null
 ) => {
   return res.status(statusCode).json({
@@ -10,4 +10,5 @@ const sendResponse = (
     data,
   });
 };
+
 export default sendResponse;

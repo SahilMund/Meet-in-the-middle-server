@@ -1,3 +1,8 @@
+import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
+import express from 'express';
+
+import connectDB from './src/configs/mongoose.js';
 import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
@@ -28,15 +33,19 @@ app.use(
   })
 );
 connectDB().then(() => {
-  console.log("✅ MongoDB Connected Successfully");
+  console.log('✅ MongoDB Connected Successfully');
+});
+
+app.get('/', (req, res) => {
+  res.send('API is working!');
 });
 
 app.use(logger); // Use logger middleware for logging requests
 
 
 app.use('/api/user', userRoutes);
-
 app.use("/api/verification", verificationRoutes);
+
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
