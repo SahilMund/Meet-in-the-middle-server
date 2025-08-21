@@ -2,6 +2,7 @@ import express from "express";
 
 import {
   acceptMeeting,
+  conflicts,
   createMeeting,
   deleteMeeting,
   editMeetingById,
@@ -17,5 +18,6 @@ router.delete("/deleteMeeting", isLoggedIn, deleteMeeting);
 router.put("/editMeeting/:meetingId", isLoggedIn, editMeetingById);
 router.put("/acceptMeeting", isLoggedIn, acceptMeeting);
 router.put("/rejectMeeting", isLoggedIn, rejectMeeting);
+router.put("/conflicts", isLoggedIn, conflicts);
 
 export default router;
