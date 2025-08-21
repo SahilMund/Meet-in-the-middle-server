@@ -14,6 +14,7 @@ export const createMeeting = async (req, res) => {
       title,
       description,
       scheduledAt,
+      endsAt,
       participants = [],
       creatorLocation,
     } = req.body;
@@ -38,6 +39,7 @@ export const createMeeting = async (req, res) => {
       description,
       creator: creatorId,
       scheduledAt,
+      endsAt,
     });
 
     // Generating meeting link
@@ -112,7 +114,7 @@ export const getMeetings = async (req, res) => {
     pageNo = parseInt(pageNo) || 1;
     items = parseInt(items) || 10;
 
-    const participations = await Participant.find({ email })
+    const myParticipations = await Participant.find({ email })
       .skip((pageNo - 1) * items)
       .limit(items)
       .populate({
@@ -123,11 +125,11 @@ export const getMeetings = async (req, res) => {
         ],
       });
 
-    if (!participations.length) {
+    if (!myParticipations.length) {
       return sendResponse(res, "No Meetings found", 200, { meetings: [] });
     }
 
-    const meetings = participations.map((p) => p.meeting);
+    const meetings = myParticipations.map((p) => p.meeting);
 
     sendResponse(res, "Meetings fetched successfully!", 200, { meetings });
   } catch (error) {
@@ -260,6 +262,41 @@ export const rejectMeeting = async (req, res) => {
     participant.status = "rejected";
     await participant.save();
     sendResponse(res, "Participantion updated successfully!", 200, {});
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+
+export const conflicts = async (req, res) => {
+  try {
+    const { meetingId } = req.params;
+    const { email } = req.user;
+
+    const currentMeeting = await Meeting.findById(meetingId);
+    if (!currentMeeting) {
+      return sendResponse(res, "Meeting not found", 404);
+    }
+
+    const myParticipations = await Participant.find({ email })
+      .select("meeting")
+      .populate("meeting");
+
+    const meetings = myParticipations.map((p) => p.meeting);
+
+    const conflicts = meetings.filter((m) => {
+      if (!m || m._id.equals(currentMeeting._id)) return false;
+
+      return (
+        m.scheduledAt < currentMeeting.endsAt &&
+        currentMeeting.scheduledAt < m.endsAt
+      );
+    });
+
+    if (!conflicts.length) {
+      return sendResponse(res, "No conflicts found", 200, { conflicts: [] });
+    }
+
+    return sendResponse(res, "Conflicts found", 200, { conflicts });
   } catch (error) {
     sendResponse(res, error.message, 500);
   }

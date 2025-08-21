@@ -26,6 +26,9 @@ const meetingSchema = new mongoose.Schema(
     scheduledAt: {
       type: Date,
     },
+    endsAt: {
+      type: Date,
+    },
     locationSuggestion: {
       lat: { type: Number },
       lng: { type: Number },
