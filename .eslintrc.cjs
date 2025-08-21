@@ -4,34 +4,39 @@ module.exports = {
     es2022: true,
   },
   extends: [
-    'eslint:recommended',
-    'plugin:n/recommended', // Node.js best practices
-    'plugin:import/recommended', // Import/export checks
-    'plugin:prettier/recommended', // Runs Prettier as an ESLint rule
+    "eslint:recommended",
+    "plugin:n/recommended", // Node.js best practices
+    "plugin:import/recommended", // Import/export checks
+    "plugin:prettier/recommended", // Runs Prettier as an ESLint rule
   ],
   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
+    ecmaVersion: "latest",
+    sourceType: "module",
   },
   rules: {
-    'prettier/prettier': 'error',
-    'no-console': 'off',
-    'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-    'import/order': [
-      'error',
+    "prettier/prettier": [
+      "error",
+      {
+        singleQuote: false,
+      },
+    ],
+    "no-console": "off",
+    "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+    "import/order": [
+      "error",
       {
         groups: [
-          'builtin',
-          'external',
-          'internal',
-          'parent',
-          'sibling',
-          'index',
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index",
         ],
-        alphabetize: { order: 'asc', caseInsensitive: true },
-        'newlines-between': 'always',
+        alphabetize: { order: "asc", caseInsensitive: true },
+        "newlines-between": "always",
       },
     ],
   },
-  ignorePatterns: ['node_modules', 'dist', 'build', 'coverage'],
+  ignorePatterns: ["node_modules", "dist", "build", "coverage"],
 };

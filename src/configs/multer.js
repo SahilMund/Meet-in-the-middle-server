@@ -33,7 +33,7 @@
 //   },
 // });
 
-import multer from 'multer';
+import multer from "multer";
 
 // Store file in memory (not directly on disk)
 const storage = multer.memoryStorage();
