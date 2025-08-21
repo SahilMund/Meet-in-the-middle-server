@@ -24,8 +24,10 @@ export const createMeeting = async (req, res) => {
 
     const creatorId = req.user?._id;
     const creatorEmail = req.user?.email;
+
     const user = await User.findById(creatorId);
     const hostName = user?.name;
+
     if (!creatorId) {
       return sendResponse(res, "Unauthorized", 401);
     }
@@ -84,16 +86,16 @@ export const createMeeting = async (req, res) => {
       meetingLink: meeting.meetingLink,
     });
 
-    try {
-      await sendMeetingInvitationMail({
-        to: participants,
-        cc: creatorEmail,
-        subject: `Meeting Invitation from ${hostName}`,
-        html,
+    sendMeetingInvitationMail({
+      to: creatorEmail,
+      cc: participants,
+      subject: `Meeting Invitation from ${hostName}`,
+      html,
+    })
+      .then()
+      .catch((error) => {
+        console.error("Error sending meeting invitation:", error);
       });
-    } catch (error) {
-      console.error("Error sending meeting invitation:", error);
-    }
 
     return sendResponse(res, "Meeting created successfully", 201, {
       meeting: updatedMeeting,
@@ -110,18 +112,22 @@ export const getMeetings = async (req, res) => {
     pageNo = parseInt(pageNo) || 1;
     items = parseInt(items) || 10;
 
-    const participations = await Participant.find({ email }).select("meeting");
+    const participations = await Participant.find({ email })
+      .skip((pageNo - 1) * items)
+      .limit(items)
+      .populate({
+        path: "meeting",
+        populate: [
+          { path: "creator", select: "name email" },
+          { path: "participants" },
+        ],
+      });
+
     if (!participations.length) {
       return sendResponse(res, "No Meetings found", 200, { meetings: [] });
     }
 
-    const meetingIds = participations.map((p) => p.meeting);
-
-    const meetings = await Meeting.find({ _id: { $in: meetingIds } })
-      .skip((pageNo - 1) * items)
-      .limit(items)
-      .populate("creator", "name email")
-      .populate("participants");
+    const meetings = participations.map((p) => p.meeting);
 
     sendResponse(res, "Meetings fetched successfully!", 200, { meetings });
   } catch (error) {
@@ -148,17 +154,17 @@ export const deleteMeeting = async (req, res) => {
       hostName: meeting.creator,
       scheduledAt: new Date(meeting.scheduledAt).toLocaleString(),
     });
-
-    try {
-      await sendMeetingInvitationMail({
-        to: req.user?.email,
-        cc: meeting.participants,
-        subject: `Meeting Cancellation from ${meeting.creator}`,
-        html,
+    sendMeetingInvitationMail({
+      to: req.user?.email,
+      cc: meeting.participants,
+      subject: `Meeting Cancellation from ${meeting.creator}`,
+      html,
+    })
+      .then()
+      .catch((error) => {
+        console.error("Error sending meeting invitation:", error);
       });
-    } catch (error) {
-      console.error("Error sending meeting invitation:", error);
-    }
+
     sendResponse(res, "Meetings deleted successfully!", 200, { meeting });
   } catch (error) {
     sendResponse(res, error.message, 500);
@@ -169,8 +175,7 @@ export const getMeetingById = async (req, res) => {
   try {
     const { meetingId } = req.params;
 
-    const meeting = await Meeting.findById(meetingId);
-    // .populate("participants");
+    const meeting = await Meeting.findById(meetingId).populate("participants");
 
     if (!meeting) {
       return sendResponse(res, "Meeting not found", 404);
@@ -196,6 +201,25 @@ export const editMeetingById = async (req, res) => {
     meeting.title = title;
     meeting.description = description;
     const updatedMeeting = await meeting.save();
+
+    const html = sendInvitationEmailHtml({
+      title,
+      description,
+      hostName: meeting.creator,
+      scheduledAt: new Date(meeting.scheduledAt).toLocaleString(),
+      meetingLink: meeting.meetingLink,
+    });
+
+    sendMeetingInvitationMail({
+      to: "",
+      ccc: meeting.participants,
+      subject: `Meeting Invitation from ${meeting.creator}`,
+      html,
+    })
+      .then()
+      .catch((error) => {
+        console.error("Error sending meeting invitation:", error);
+      });
 
     sendResponse(res, "Meeting updated successfully!", 200, {
       meeting: updatedMeeting,
