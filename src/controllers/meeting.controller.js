@@ -23,6 +23,8 @@ export const createMeeting = async (req, res) => {
       return sendResponse(res, "Title and scheduled time are required");
     }
 
+    const { lat, lng, placeName } = creatorLocation;
+
     const creatorId = req.user?._id;
     const creatorEmail = req.user?.email;
 
@@ -70,7 +72,7 @@ export const createMeeting = async (req, res) => {
         user: creatorId,
         email: creatorEmail,
         status: "accepted",
-        location: creatorLocation || {},
+        location: { lat, lng, placeName } || {},
         meeting: meeting._id,
       },
     ]);
@@ -233,7 +235,7 @@ export const editMeetingById = async (req, res) => {
 
 export const acceptMeeting = async (req, res) => {
   try {
-    const { meetingId } = req.body;
+    const { meetingId, lat, lng, placeName } = req.body;
     const email = req.user?.email;
 
     const participant = await Participant.find({ meeting: meetingId });
@@ -242,6 +244,10 @@ export const acceptMeeting = async (req, res) => {
       return sendResponse(res, "Participant not found", 404);
     }
     participant.status = "accepted";
+    participant.location.lat = lat;
+    participant.location.lng = lng;
+    participant.location.placeName = placeName;
+
     await participant.save();
     sendResponse(res, "Participantion updated successfully!", 200, {});
   } catch (error) {
