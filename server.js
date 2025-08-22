@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
+import { rateLimit } from "express-rate-limit";
 
 import connectDB from "./src/configs/mongoose.js";
 import { logger } from "./src/middlewares/logger.js";
@@ -18,6 +19,7 @@ const PORT = process.env.PORT || 8000;
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use(
   cors({
     origin: process.env.FRONTEND_URL, // 👈 frontend URL
@@ -26,6 +28,13 @@ app.use(
     credentials: true, // 👈 allow credentials (cookies, auth headers)
   })
 );
+
+const limiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 100,
+  message: "Too many requests, please try again later.",
+});
+
 connectDB().then(() => {
   console.log("✅ MongoDB Connected Successfully");
 });
@@ -34,9 +43,10 @@ app.get("/", (req, res) => {
   res.send("API is working!");
 });
 
-app.use(logger); // Use logger middleware for logging requests
+app.use(logger);
 
-app.use("/api", routes);
+app.use("/api", limiter, routes);
+
 app.use("/api/verification", verificationRoutes);
 
 app.listen(PORT, () => {
