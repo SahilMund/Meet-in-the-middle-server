@@ -24,10 +24,9 @@ export const createMeeting = async (req, res) => {
     }
 
     const { lat, lng, placeName } = creatorLocation;
-
-    const creatorId = req.user?._id;
+    const creatorId = req.user?.id;
     const creatorEmail = req.user?.email;
-
+    console.log(req.body);
     const user = await User.findById(creatorId);
     const hostName = user?.name;
 
@@ -50,9 +49,9 @@ export const createMeeting = async (req, res) => {
 
     const allParticipants = await Promise.all([
       ...participants.map(async (p) => {
-        let userId = p.userId || null;
+        let userId = null;
 
-        if (!userId && p.email) {
+        if ( p.email) {
           const existingUser = await User.findOne({ email: p.email });
           if (existingUser) {
             userId = existingUser._id;
@@ -78,9 +77,10 @@ export const createMeeting = async (req, res) => {
     ]);
 
     const createdParticipants = await Participant.insertMany(allParticipants);
-
+    // console.log({createdParticipants})
     meeting.participants = createdParticipants.map((p) => p._id);
     const updatedMeeting = await meeting.save();
+    console.log({updatedMeeting})
 
     const html = sendInvitationEmailHtml({
       title,

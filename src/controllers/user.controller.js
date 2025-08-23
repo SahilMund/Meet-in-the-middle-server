@@ -24,6 +24,7 @@ export const getUserInfo = async (req, res) => {
     role: user.role,
     name: user.name,
     avartar: user.avatar,
+    data:req.user
   });
 };
 
@@ -32,7 +33,7 @@ export const login = async (req, res) => {
   try {
     const user = await User.findOne({ email });
 
-    if (!user || (await user.comparePassword(password))) {
+    if (!user || !(await user.comparePassword(password))) {
       return sendResponse(res, "Invalid credentials", 401);
     }
 
