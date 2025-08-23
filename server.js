@@ -11,7 +11,7 @@ import routes from "./src/routes/index.js";
 import verificationRoutes from "./src/routes/verificationOTP.route.js";
 
 // import User from "./src/models/user.model.js";
-// User.deleteMany().then() //deleting users to recreate all again
+// User.deleteMany().then() // 👈 deleting users to recreate all again
 
 const app = express();
 const PORT = process.env.PORT || 8000;

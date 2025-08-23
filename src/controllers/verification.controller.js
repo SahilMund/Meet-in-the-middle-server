@@ -20,6 +20,7 @@ const sendOTP = async (req, res) => {
       await otpData.save();
       console.log({ otpData });
     }
+    console.log(email,otp)
     await sendVerificationEmail(email,otp);
     res.status(201).json({ message: "OTP sent successfully" });
   } catch (error) {
@@ -33,7 +34,6 @@ const verifyOTP = async (req, res) => {
 
     // 1. Check OTP
     const otpData = await OtpModel.findOne({ email, otp });
-    console.log(otpData);
     if (!otpData) {
       return res.status(400).json({ message: "Invalid OTP" });
     }
@@ -42,6 +42,7 @@ const verifyOTP = async (req, res) => {
     const currentTime = new Date();
     const otpTime = otpData.createdAt;
     const timeDiff = (currentTime - otpTime) / 1000; // seconds
+    console.log(timeDiff > 1000)
     if (timeDiff > 1000) {
       return res.status(400).json({ message: "OTP expired" });
     }
