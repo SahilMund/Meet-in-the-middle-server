@@ -8,8 +8,8 @@ import {
   editMeetingById,
   getMeetings,
   rejectMeeting,
-} from "../controllers/meeting.controller";
-import isLoggedIn from "../middlewares/isLoggedIn.middleware";
+} from "../controllers/meeting.controller.js";
+import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
 const router = express.Router();
 
 router.post("/createMeeting", isLoggedIn, createMeeting);
