@@ -8,6 +8,8 @@ import {
   editMeetingById,
   getMeetings,
   rejectMeeting,
+  dashboardStats,
+  upcomingMeetings,
 } from "../controllers/meeting.controller.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
 const router = express.Router();
@@ -19,5 +21,7 @@ router.put("/editMeeting/:meetingId", isLoggedIn, editMeetingById);
 router.put("/acceptMeeting", isLoggedIn, acceptMeeting);
 router.put("/rejectMeeting", isLoggedIn, rejectMeeting);
 router.put("/conflicts", isLoggedIn, conflicts);
+router.get("/getMeetings", isLoggedIn, dashboardStats);
+router.get("/getMeetings", isLoggedIn, upcomingMeetings);
 
 export default router;
