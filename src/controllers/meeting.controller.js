@@ -149,7 +149,7 @@ export const deleteMeeting = async (req, res) => {
       return sendResponse(res, "Meeting not found", 500);
     }
 
-    await Meeting.findByIdAndDelete(meetingId).populate("participants");
+    await Meeting.findByIdAndDelete(meetingId);
     await Participant.deleteMany({ meeting: { $in: meeting.participants } });
 
     const html = sendCancellationEmailHtml({
@@ -303,6 +303,97 @@ export const conflicts = async (req, res) => {
     }
 
     return sendResponse(res, "Conflicts found", 200, { conflicts });
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+
+export const dashboardStats = async (req, res) => {
+  try {
+    const email = req.user?.email;
+    const data = {
+      upcomingmeetings: 0,
+      pendingInvations: 0,
+      totalMeetings: 0,
+      currentWeekMeetingCount: 0,
+      avgParticipants: 0,
+      successRate: 0,
+    };
+    const myParticipations = await Participant.find({ email }).populate({
+      path: "meeting",
+      populate: [
+        { path: "creator", select: "name email" },
+        { path: "participants" },
+      ],
+    });
+
+    data.totalMeetings = myParticipations.length;
+    const upcomingmeetings = myParticipations.filter(
+      (p) => p.meeting.scheduledAt > Date.now()
+    );
+    data.upcomingmeetings = upcomingmeetings.length;
+
+    const pendingInvations = myParticipations.filter(
+      (p) => p.status === "pending"
+    );
+    data.pendingInvations = pendingInvations.length;
+
+    const startOfWeek = new Date();
+    startOfWeek.setHours(0, 0, 0, 0);
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(endOfWeek.getDate() + 7);
+
+    const currentWeekMeetingCount = myParticipations.filter(
+      (p) =>
+        p.meeting.scheduledAt >= startOfWeek &&
+        p.meeting.scheduledAt <= endOfWeek
+    );
+    data.currentWeekMeetingCount = currentWeekMeetingCount.length;
+
+    if (myParticipations.length > 0) {
+      const totalPartcipants = myParticipations.reduce((sum, p) => {
+        return sum + p.meeting?.participants?.length || 0;
+      });
+      data.avgParticipants = totalPartcipants / myParticipations.length;
+
+      const accepted = myParticipations.filter((p) => p.status === "accepted");
+      data.successRate = accepted.length / myParticipations.length;
+    }
+    return sendResponse(res, "succesfully fetch the stats", 200, data);
+  } catch (error) {
+    return sendResponse(res, { message: error.message }, 500, null);
+  }
+};
+
+export const upcomingMeetings = async (req, res) => {
+  try {
+    const email = req.user?.email;
+    let { pageNo, items } = req.body;
+    pageNo = parseInt(pageNo) || 1;
+    items = parseInt(items) || 10;
+
+    const myParticipations = await Participant.find({ email })
+      .skip((pageNo - 1) * items)
+      .limit(items)
+      .populate({
+        path: "meeting",
+        match: { date: { $gte: new Date() } },
+        populate: [
+          { path: "creator", select: "name email" },
+          { path: "participants" },
+        ],
+      });
+    const upcomingParticipations = myParticipations.filter(
+      (p) => p.meeting !== null
+    );
+    if (!myParticipations.length) {
+      return sendResponse(res, "No Meetings found", 200, { meetings: [] });
+    }
+
+    const meetings = upcomingParticipations.map((p) => p.meeting);
+
+    sendResponse(res, "Meetings fetched successfully!", 200, { meetings });
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
