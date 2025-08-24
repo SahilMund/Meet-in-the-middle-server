@@ -9,3 +9,163 @@
 [2025-08-23T12:08:06.164Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
 [2025-08-23T12:09:52.240Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
 [2025-08-23T12:12:09.123Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-23T17:15:56.901Z] POST /api/verification/sendOtp | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:15:56.921Z] POST /api/verification/sendOtp | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:16:17.743Z] POST /api/verification/verifyOTP | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:16:20.746Z] POST /api/verification/verifyOTP | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:16:23.159Z] POST /api/verification/verifyOTP | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:16:38.468Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:16:44.970Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:16:45.025Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:19:27.313Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:19:33.813Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:19:33.846Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:20:45.595Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:20:52.097Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:20:52.135Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:23:13.882Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:23:20.395Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:23:20.431Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:23:27.686Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:23:34.141Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:23:34.181Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:24:58.881Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:25:02.679Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:25:02.711Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:44:29.902Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T17:44:29.933Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T19:05:55.672Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T19:09:18.866Z] POST /api/verification/sendOtp | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T19:09:58.503Z] POST /api/verification/verifyOTP | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T19:10:42.493Z] POST /api/verification/sendOtp | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T19:11:07.722Z] POST /api/verification/verifyOTP | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T19:11:25.501Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T19:11:30.399Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T19:11:40.836Z] POST /api/user/logout | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T19:28:40.481Z] GET /api/users/google | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T19:28:40.529Z] GET /.well-known/appspecific/com.chrome.devtools.json | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T19:31:27.804Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T19:31:32.861Z] GET /api/user/google | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T19:45:00.592Z] GET /api/api/auth/google | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T19:45:19.972Z] GET /api/api/auth/google | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T19:45:24.714Z] GET /api/auth/google | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-23T19:47:17.299Z] GET /api/auth/google | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-24T08:32:57.670Z] POST /api/login | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:33:16.227Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:34:09.598Z] POST //api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:34:43.702Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:35:35.734Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:37:34.535Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:39:32.387Z] DELETE /api/meeting/deleteMeeting/68aacf4e5c5223ef20039a1d | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:39:58.768Z] DELETE /api/meeting/deleteMeeting/68aacf4e5c5223ef20039a1d | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:40:11.363Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:40:56.042Z] DELETE /api/meeting/deleteMeeting/68aacfeb727683584d5f84f1 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:41:28.832Z] DELETE /api/meeting/deleteMeeting/68aacfeb727683584d5f84f1 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:42:45.769Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:44:03.690Z] DELETE /api/meeting/deleteMeeting/68aad08622fc0decead64f0b | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:44:29.692Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:45:30.698Z] DELETE /api/meeting/deleteMeeting/68a9f51f156ff86594d3f387 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:45:48.971Z] DELETE /api/meeting/deleteMeeting/68aad0edd90cc4233405e1b0 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:46:53.766Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:49:03.337Z] DELETE /api/meeting/deleteMeeting/68aad17dc20ae6416f7aa539 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:49:12.539Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:51:50.602Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:52:36.281Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:52:53.512Z] DELETE /api/meeting/deleteMeeting/68a9ad6dfdaf62bc614e9947 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:53:09.059Z] DELETE /api/meeting/deleteMeeting/68a9ae24352c7ff6bfc2a3ff | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:53:15.437Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:53:32.582Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:53:42.035Z] DELETE /api/meeting/deleteMeeting/68a9ae785080c990d9d00365 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:53:47.084Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:55:10.258Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:56:00.269Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:56:56.536Z] DELETE /api/meeting/deleteMeeting/68aad3a0f5a2156442a80438 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:57:15.255Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:57:17.764Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:58:00.182Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T08:59:00.410Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:05:55.566Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:06:15.036Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:06:25.191Z] DELETE /api/meeting/deleteMeeting/68aad607d49632e25d231f10 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:06:30.459Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:07:13.379Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:07:17.401Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:07:49.856Z] DELETE /api/meeting/deleteMeeting/68a9f51f156ff86594d3f387 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:08:03.857Z] DELETE /api/meeting/deleteMeeting/68aad5f3d49632e25d231f04 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:08:07.235Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:09:32.979Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:09:40.827Z] DELETE /api/meeting/getMeetingById/68aad641d49632e25d231f21 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:11:31.775Z] DELETE /api/meeting/editMeetingById/68aad641d49632e25d231f21 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:11:47.106Z] PUT /api/meeting/editMeetingById/68aad641d49632e25d231f21 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:12:08.962Z] PUT /api/meeting/editMeeting/68aad641d49632e25d231f21 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:12:14.119Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:16:38.058Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:17:31.716Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:17:51.236Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:18:08.460Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:19:38.705Z] PUT /api/meeting/acceptMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:21:38.243Z] PUT /api/meeting/acceptMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:23:51.688Z] PUT /api/meeting/acceptMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:23:55.243Z] PUT /api/meeting/acceptMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:25:34.423Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:26:00.941Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:26:52.096Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:27:10.136Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:27:17.698Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:30:37.111Z] PUT /api/meeting/acceptMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:31:37.281Z] PUT /api/meeting/acceptMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:31:45.069Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:34:01.743Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:34:18.687Z] DELETE /api/meeting/deleteMeeting/68aadc89950bd1c66879edca | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:38:41.085Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:39:03.571Z] DELETE /api/meeting/deleteMeeting/68aadda19f7a5b585ec3c575 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:41:01.582Z] DELETE /api/meeting/deleteMeeting/68aadaa89ecedf9f4c406c68 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:42:14.644Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:42:29.816Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:43:01.857Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:45:13.290Z] PUT /api/meeting/rejectMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:46:06.691Z] PUT /api/meeting/rejectMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:46:48.353Z] PUT /api/meeting/rejectMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:48:54.337Z] PUT /api/meeting/rejectMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:49:01.747Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:49:45.028Z] PUT /api/meeting/rejectMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:49:53.045Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:52:46.347Z] PUT /api/meeting/conflicts/68aadaa89ecedf9f4c406c68 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:55:33.708Z] GET /api/meeting/dashboardStats | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:56:10.889Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:56:53.443Z] GET /api/meeting/getMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:58:05.747Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:58:53.449Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:58:57.603Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T09:59:02.296Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:04:14.066Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:12:29.416Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:12:41.932Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:13:27.087Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:13:34.975Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:14:25.511Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:15:06.226Z] PUT /api/meeting/acceptMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:15:55.923Z] GET /api/meeting/dashboardStats | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:16:17.646Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:19:03.143Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:19:08.079Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:19:59.525Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:20:01.932Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:20:28.501Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:22:37.802Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:27:11.091Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:27:18.152Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:27:46.373Z] DELETE /api/meeting/deleteMeeting/68aae8ff46cfbb6c222e4fda | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:29:00.735Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:29:06.632Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:30:02.670Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:30:07.940Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:30:20.686Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:35:59.150Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:38:58.915Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:39:12.111Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:39:43.334Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:40:31.125Z] PUT /api/meeting/acceptMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:41:12.979Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:42:41.066Z] POST /api/meeting/createMeeting | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-24T10:42:51.831Z] GET /api/meeting/upcomingMeetings | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
