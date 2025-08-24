@@ -24,7 +24,7 @@ export const getUserInfo = async (req, res) => {
     role: user.role,
     name: user.name,
     avartar: user.avatar,
-    data:req.user
+    data: req.user,
   });
 };
 

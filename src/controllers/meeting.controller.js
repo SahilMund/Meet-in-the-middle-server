@@ -26,7 +26,6 @@ export const createMeeting = async (req, res) => {
     const { lat, lng, placeName } = creatorLocation;
     const creatorId = req.user?.id;
     const creatorEmail = req.user?.email;
-    console.log(req.body);
     const user = await User.findById(creatorId);
     const hostName = user?.name;
 
@@ -34,7 +33,6 @@ export const createMeeting = async (req, res) => {
       return sendResponse(res, "Unauthorized", 401);
     }
 
-    //Create meeting data
     const meeting = new Meeting({
       title,
       description,
@@ -51,7 +49,7 @@ export const createMeeting = async (req, res) => {
       ...participants.map(async (p) => {
         let userId = null;
 
-        if ( p.email) {
+        if (p.email) {
           const existingUser = await User.findOne({ email: p.email });
           if (existingUser) {
             userId = existingUser._id;
@@ -77,10 +75,8 @@ export const createMeeting = async (req, res) => {
     ]);
 
     const createdParticipants = await Participant.insertMany(allParticipants);
-    // console.log({createdParticipants})
     meeting.participants = createdParticipants.map((p) => p._id);
     const updatedMeeting = await meeting.save();
-    console.log({updatedMeeting})
 
     const html = sendInvitationEmailHtml({
       title,
@@ -143,14 +139,24 @@ export const deleteMeeting = async (req, res) => {
   try {
     const { meetingId } = req.params;
 
-    const meeting = await Meeting.findById(meetingId).populate("participants");
-
+    const meeting = await Meeting.findById(meetingId).populate(
+      "creator",
+      "name email"
+    );
     if (!meeting) {
       return sendResponse(res, "Meeting not found", 500);
     }
 
+    if (meeting.creator._id.toString() != req.user.id) {
+      console.log({
+        meetingId: meeting.creator._id.toString(),
+        userId: req.user.id,
+        result: meeting.creator._id.toString() != req.user.id,
+      });
+      return sendResponse(res, "not authorised to delete meeting", 500);
+    }
     await Meeting.findByIdAndDelete(meetingId);
-    await Participant.deleteMany({ meeting: { $in: meeting.participants } });
+    await Participant.deleteMany({ meeting: meetingId });
 
     const html = sendCancellationEmailHtml({
       title: meeting.title,
@@ -238,18 +244,25 @@ export const acceptMeeting = async (req, res) => {
     const { meetingId, lat, lng, placeName } = req.body;
     const email = req.user?.email;
 
-    const participant = await Participant.find({ meeting: meetingId });
+    const updatedParticipant = await Participant.findOneAndUpdate(
+      { meeting: meetingId, email },
+      {
+        status: "accepted",
+        location: { lat, lng, placeName },
+      },
+      { new: true }
+    );
 
-    if (!participant || participant.email !== email) {
+    if (!updatedParticipant) {
       return sendResponse(res, "Participant not found", 404);
     }
-    participant.status = "accepted";
-    participant.location.lat = lat;
-    participant.location.lng = lng;
-    participant.location.placeName = placeName;
 
-    await participant.save();
-    sendResponse(res, "Participantion updated successfully!", 200, {});
+    sendResponse(
+      res,
+      "Participation updated successfully!",
+      200,
+      updatedParticipant
+    );
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
@@ -260,10 +273,14 @@ export const rejectMeeting = async (req, res) => {
     const { meetingId } = req.body;
     const email = req.user?.email;
 
-    const participant = await Participant.find({ meeting: meetingId });
+    const participant = await Participant.findOne({
+      meeting: meetingId,
+      email,
+    });
+    console.log({ participant });
 
     if (!participant || participant.email !== email) {
-      return sendResponse(res, "Participant not found", 404);
+      return sendResponse(res, "Participantions not found", 404);
     }
     participant.status = "rejected";
     await participant.save();
@@ -378,20 +395,19 @@ export const upcomingMeetings = async (req, res) => {
       .limit(items)
       .populate({
         path: "meeting",
-        match: { date: { $gte: new Date() } },
+        match: { scheduledAt: { $gte: new Date() } },
         populate: [
           { path: "creator", select: "name email" },
           { path: "participants" },
         ],
       });
+
     const upcomingParticipations = myParticipations.filter(
       (p) => p.meeting !== null
     );
-    if (!myParticipations.length) {
-      return sendResponse(res, "No Meetings found", 200, { meetings: [] });
-    }
 
     const meetings = upcomingParticipations.map((p) => p.meeting);
+    console.log({ myParticipations, upcomingMeetings, meetings });
 
     sendResponse(res, "Meetings fetched successfully!", 200, { meetings });
   } catch (error) {
