@@ -11,6 +11,7 @@ import {
   dashboardStats,
   upcomingMeetings,
   getMeetingById,
+  recentActivity,
 } from "../controllers/meeting.controller.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
 const router = express.Router();
@@ -23,7 +24,8 @@ router.put("/editMeeting/:meetingId", isLoggedIn, editMeetingById);
 router.put("/acceptMeeting", isLoggedIn, acceptMeeting);
 router.put("/rejectMeeting", isLoggedIn, rejectMeeting);
 router.get("/conflicts/:meetingId", isLoggedIn, conflicts);
+
 router.get("/dashboardStats", isLoggedIn, dashboardStats);
 router.get("/upcomingMeetings", isLoggedIn, upcomingMeetings);
-
+router.get("/recentActivity", isLoggedIn, recentActivity);
 export default router;

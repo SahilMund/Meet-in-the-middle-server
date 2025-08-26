@@ -414,3 +414,44 @@ export const upcomingMeetings = async (req, res) => {
     sendResponse(res, error.message, 500);
   }
 };
+
+export const recentActivity = async (req, res) => {
+  try {
+    const { userId, limit = 5 } = req.params;
+    if (!userId) {
+      return res.sendResponse(res, "userId is required", 400, null);
+    }
+    const recentMeetings = await Meeting.find({ creator: userId })
+      .populate("creator", "name email")
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit));
+    const meetingActivities = recentMeetings.map((meeting) => ({
+      type: "meetingCreated",
+      user: meeting.creator,
+      target: { meetingId: meeting._id, title: meeting.title },
+      timestamp: meeting.createdAt,
+    }));
+
+    const recentPartcipants = await Participant.find({ user: userId })
+      .populate("user", "name email")
+      .populate("meeting", "title")
+      .sort({ updatedAt: -1 })
+      .limit(parseInt(limit));
+    const participantActivities = recentPartcipants.map((p) => ({
+      type: "participantAction",
+      user: p.user,
+      target: {
+        meetingId: p.meeting._id,
+        meetingTitle: p.meeting.title,
+        status: p.status,
+      },
+      timestamp: p.updatedAt,
+    }));
+
+    const allActivities = [...meetingActivities, ...participantActivities];
+    allActivities.sort((a, b) => b.timestamp - a.timestamp);
+    return sendResponse(res, "success", 200, allActivities);
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
