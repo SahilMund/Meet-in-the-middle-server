@@ -34,6 +34,7 @@ export const createMeeting = async (req, res) => {
       return sendResponse(res, "Unauthorized", 401);
     }
 
+    //Create meeting data
     const meeting = new Meeting({
       title,
       description,
@@ -145,24 +146,14 @@ export const deleteMeeting = async (req, res) => {
   try {
     const { meetingId } = req.params;
 
-    const meeting = await Meeting.findById(meetingId).populate(
-      "creator",
-      "name email"
-    );
+    const meeting = await Meeting.findById(meetingId).populate("participants");
+
     if (!meeting) {
       return sendResponse(res, "Meeting not found", 500);
     }
 
-    if (meeting.creator._id.toString() != req.user.id) {
-      console.log({
-        meetingId: meeting.creator._id.toString(),
-        userId: req.user.id,
-        result: meeting.creator._id.toString() != req.user.id,
-      });
-      return sendResponse(res, "not authorised to delete meeting", 500);
-    }
     await Meeting.findByIdAndDelete(meetingId);
-    await Participant.deleteMany({ meeting: meetingId });
+    await Participant.deleteMany({ meeting: { $in: meeting.participants } });
 
     const html = sendCancellationEmailHtml({
       title: meeting.title,
@@ -257,16 +248,16 @@ export const acceptMeeting = async (req, res) => {
     if (participant.email === email)
       return sendResponse(res, "You are the Creator of this room", 401);
 
-    if (!updatedParticipant) {
+    if (!participant || participant.email !== email) {
       return sendResponse(res, "Participant not found", 404);
     }
+    participant.status = "accepted";
+    participant.location.lat = lat;
+    participant.location.lng = lng;
+    participant.location.placeName = placeName;
 
-    sendResponse(
-      res,
-      "Participation updated successfully!",
-      200,
-      updatedParticipant
-    );
+    await participant.save();
+    sendResponse(res, "Participantion updated successfully!", 200, {});
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
@@ -285,7 +276,7 @@ export const rejectMeeting = async (req, res) => {
     if (participant.email === email)
       return sendResponse(res, "Createor Can't reject room ", 401);
     if (!participant || participant.email !== email) {
-      return sendResponse(res, "Participantions not found", 404);
+      return sendResponse(res, "Participant not found", 404);
     }
     participant.status = "rejected";
     await participant.save();
@@ -401,19 +392,20 @@ export const upcomingMeetings = async (req, res) => {
       .limit(items)
       .populate({
         path: "meeting",
-        match: { scheduledAt: { $gte: new Date() } },
+        match: { date: { $gte: new Date() } },
         populate: [
           { path: "creator", select: "name email" },
           { path: "participants" },
         ],
       });
-
     const upcomingParticipations = myParticipations.filter(
       (p) => p.meeting !== null
     );
+    if (!myParticipations.length) {
+      return sendResponse(res, "No Meetings found", 200, { meetings: [] });
+    }
 
     const meetings = upcomingParticipations.map((p) => p.meeting);
-    console.log({ myParticipations, upcomingMeetings, meetings });
 
     sendResponse(res, "Meetings fetched successfully!", 200, { meetings });
   } catch (error) {

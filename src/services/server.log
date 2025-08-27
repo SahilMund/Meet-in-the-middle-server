@@ -631,3 +631,10 @@
 [2025-08-27T06:19:18.422Z] GET /api/meeting/getRecentActivity?limit=5 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
 [2025-08-27T06:25:05.855Z] GET /api/meeting/getRecentActivity?limit=1 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
 [2025-08-27T06:25:15.449Z] GET /api/meeting/getRecentActivity?limit=7 | Status: 200 | IP: ::1 | User-Agent: PostmanRuntime/7.45.0 
+[2025-08-27T06:35:35.941Z] POST /api/user/login | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-27T06:35:43.245Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-27T06:35:43.606Z] GET /api/meeting/getMeetings?pageNo=1&items=10 | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-27T06:35:43.640Z] GET /api/meeting/getDashBoardStats | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-27T06:37:38.427Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-27T06:37:39.515Z] GET /api/meeting/getMeetings?pageNo=1&items=10 | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-27T06:37:39.544Z] GET /api/meeting/getDashBoardStats | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
