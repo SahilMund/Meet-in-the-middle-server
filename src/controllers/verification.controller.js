@@ -1,7 +1,13 @@
 import OtpModel from "../models/otp.model.js";
 import UserModel from "../models/user.model.js";
-import { sendWelComeMail } from "../utils/sendMail.util.js";
+
 import userSettings from "../models/userSettings.mode.js";
+
+import {
+  sendWelComeMail,
+  sendVerificationEmail,
+} from "../utils/sendMail.util.js";
+
 
 const sendOTP = async (req, res) => {
   try {
@@ -21,7 +27,8 @@ const sendOTP = async (req, res) => {
       await otpData.save();
       console.log(otpData);
     }
-    exists && console.log({ exists }); //temporary
+
+    await sendVerificationEmail(email, otp);
 
     res.status(201).json({ message: "OTP sent successfully" });
   } catch (error) {
@@ -35,7 +42,7 @@ const verifyOTP = async (req, res) => {
 
     // 1. Check OTP
     const otpData = await OtpModel.findOne({ email, otp });
-    console.log(otpData);
+    console.log({ email, otp });
     if (!otpData) {
       return res.status(400).json({ message: "Invalid OTP" });
     }

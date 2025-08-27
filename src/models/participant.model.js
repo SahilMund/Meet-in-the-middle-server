@@ -18,6 +18,7 @@ const participantSchema = new Schema(
     location: {
       lat: { type: Number },
       lng: { type: Number },
+      placeName: { type: String },
     },
     meeting: {
       type: Schema.Types.ObjectId,
@@ -31,7 +32,7 @@ const participantSchema = new Schema(
       },
     ],
   },
-  { _id: false }
+  { timestamps:true }
 );
 
 const Participant = mongoose.model("Participant", participantSchema);
