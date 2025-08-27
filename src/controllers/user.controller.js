@@ -21,10 +21,10 @@ export const getUserInfo = async (req, res) => {
   // Return user information
   return sendResponse(res, "User logged in Successfully", 200, {
     email: user.email,
+    id: user._id,
     role: user.role,
     name: user.name,
     avartar: user.avatar,
-    data:req.user
   });
 };
 

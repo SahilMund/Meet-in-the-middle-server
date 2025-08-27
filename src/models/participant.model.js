@@ -32,7 +32,7 @@ const participantSchema = new Schema(
       },
     ],
   },
-  { _id: false }
+  { timestamps:true }
 );
 
 const Participant = mongoose.model("Participant", participantSchema);

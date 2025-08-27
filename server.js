@@ -11,7 +11,11 @@ import routes from "./src/routes/index.js";
 import verificationRoutes from "./src/routes/verificationOTP.route.js";
 
 // import User from "./src/models/user.model.js";
+// import Meetings from "./src/models/meeting.model.js";
+// import Participants from "./src/models/participant.model.js";
 // User.deleteMany().then() //deleting users to recreate all again
+// Participants.deleteMany().then() //deleting participants to recreate all again
+// Meetings.deleteMany().then() //deleting Meetings to recreate all again
 
 const app = express();
 const PORT = process.env.PORT || 8000;

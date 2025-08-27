@@ -1,3 +1,4 @@
+import { populate } from "dotenv";
 import sendCancellationEmailHtml from "../emailTemplates/meetingCancellation.js";
 import sendInvitationEmailHtml from "../emailTemplates/meetingInvitation.js";
 import Meeting from "../models/meeting.model.js";
@@ -26,11 +27,10 @@ export const createMeeting = async (req, res) => {
     const { lat, lng, placeName } = creatorLocation;
     const creatorId = req.user?.id;
     const creatorEmail = req.user?.email;
-    console.log(req.body);
     const user = await User.findById(creatorId);
     const hostName = user?.name;
 
-    if (!creatorId) {
+    if (!user) {
       return sendResponse(res, "Unauthorized", 401);
     }
 
@@ -48,39 +48,39 @@ export const createMeeting = async (req, res) => {
     await meeting.save();
 
     const allParticipants = await Promise.all([
-      ...participants.map(async (p) => {
-        let userId = null;
+      ...participants
+        .filter((p) => p.email !== creatorEmail)
+        .map(async (p) => {
+          let userId = null;
 
-        if ( p.email) {
-          const existingUser = await User.findOne({ email: p.email });
-          if (existingUser) {
-            userId = existingUser._id;
+          if (p.email) {
+            const existingUser = await User.findOne({ email: p.email });
+            if (existingUser) {
+              userId = existingUser._id;
+            }
           }
-        }
 
-        return {
-          user: userId || null,
-          email: p.email,
-          status: "pending",
-          meeting: meeting._id,
-        };
-      }),
-
-      // creator details
-      {
-        user: creatorId,
-        email: creatorEmail,
-        status: "accepted",
-        location: { lat, lng, placeName } || {},
-        meeting: meeting._id,
-      },
+          return {
+            user: userId,
+            email: p.email,
+            status: "pending",
+            meeting: meeting._id,
+          };
+        }),
     ]);
+    //add meeying creator in paticipants
+    allParticipants.push({
+      user: creatorId,
+      email: creatorEmail,
+      status: "accepted",
+      location: { lat, lng, placeName } || {},
+      meeting: meeting._id,
+    });
 
+    // creator details
     const createdParticipants = await Participant.insertMany(allParticipants);
-    // console.log({createdParticipants})
     meeting.participants = createdParticipants.map((p) => p._id);
     const updatedMeeting = await meeting.save();
-    console.log({updatedMeeting})
 
     const html = sendInvitationEmailHtml({
       title,
@@ -112,7 +112,7 @@ export const createMeeting = async (req, res) => {
 export const getMeetings = async (req, res) => {
   try {
     const email = req.user?.email;
-    let { pageNo, items } = req.body;
+    let { pageNo, items } = req.query;
     pageNo = parseInt(pageNo) || 1;
     items = parseInt(items) || 10;
 
@@ -123,17 +123,20 @@ export const getMeetings = async (req, res) => {
         path: "meeting",
         populate: [
           { path: "creator", select: "name email" },
-          { path: "participants" },
+          {
+            path: "participants",
+            populate: { path: "user", select: "name email avatar" },
+          },
         ],
       });
-
     if (!myParticipations.length) {
       return sendResponse(res, "No Meetings found", 200, { meetings: [] });
     }
 
     const meetings = myParticipations.map((p) => p.meeting);
-
-    sendResponse(res, "Meetings fetched successfully!", 200, { meetings });
+    sendResponse(res, "Meetings fetched successfully!", 200, {
+      meetings: meetings.filter((p) => p),
+    });
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
@@ -238,7 +241,12 @@ export const acceptMeeting = async (req, res) => {
     const { meetingId, lat, lng, placeName } = req.body;
     const email = req.user?.email;
 
-    const participant = await Participant.find({ meeting: meetingId });
+    const participant = await Participant.findOne({
+      meeting: meetingId,
+      email,
+    });
+    if (participant.email === email)
+      return sendResponse(res, "You are the Creator of this room", 401);
 
     if (!participant || participant.email !== email) {
       return sendResponse(res, "Participant not found", 404);
@@ -260,8 +268,13 @@ export const rejectMeeting = async (req, res) => {
     const { meetingId } = req.body;
     const email = req.user?.email;
 
-    const participant = await Participant.find({ meeting: meetingId });
+    const participant = await Participant.findOne({
+      meeting: meetingId,
+      email,
+    });
 
+    if (participant.email === email)
+      return sendResponse(res, "Createor Can't reject room ", 401);
     if (!participant || participant.email !== email) {
       return sendResponse(res, "Participant not found", 404);
     }
@@ -328,8 +341,9 @@ export const dashboardStats = async (req, res) => {
     });
 
     data.totalMeetings = myParticipations.length;
+    let nv = Date.now();
     const upcomingmeetings = myParticipations.filter(
-      (p) => p.meeting.scheduledAt > Date.now()
+      (p) => p.meeting.scheduledAt > nv
     );
     data.upcomingmeetings = upcomingmeetings.length;
 
@@ -354,7 +368,7 @@ export const dashboardStats = async (req, res) => {
     if (myParticipations.length > 0) {
       const totalPartcipants = myParticipations.reduce((sum, p) => {
         return sum + p.meeting?.participants?.length || 0;
-      });
+      }, 0);
       data.avgParticipants = totalPartcipants / myParticipations.length;
 
       const accepted = myParticipations.filter((p) => p.status === "accepted");
@@ -394,6 +408,48 @@ export const upcomingMeetings = async (req, res) => {
     const meetings = upcomingParticipations.map((p) => p.meeting);
 
     sendResponse(res, "Meetings fetched successfully!", 200, { meetings });
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+export const recentActivity = async (req, res) => {
+  const { id: userId } = req.user;
+  try {
+    let { limit } = req.query;
+    limit = limit || 5;
+    if (!userId) {
+      return res.sendResponse(res, "userId is required", 400, null);
+    }
+    const recentMeetings = await Meeting.find({ creator: userId })
+      .populate("creator", "name email")
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit));
+    const meetingActivities = recentMeetings.map((meeting) => ({
+      type: "meetingCreated",
+      user: meeting.creator,
+      target: { meetingId: meeting._id, title: meeting.title },
+      timestamp: meeting.createdAt,
+    }));
+
+    const recentPartcipants = await Participant.find({ user: userId })
+      .populate("user", "name email")
+      .populate("meeting", "title")
+      .sort({ updatedAt: -1 })
+      .limit(parseInt(limit));
+    const participantActivities = recentPartcipants.map((p) => ({
+      type: "participantAction",
+      user: p.user,
+      target: {
+        meetingId: p.meeting._id,
+        meetingTitle: p.meeting.title,
+        status: p.status,
+      },
+      timestamp: p.updatedAt,
+    }));
+
+    const allActivities = [...meetingActivities, ...participantActivities];
+    allActivities.sort((a, b) => b.timestamp - a.timestamp);
+    return sendResponse(res, "success", 200, allActivities);
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
