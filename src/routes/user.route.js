@@ -10,6 +10,10 @@ import {
   logout,
   uploadToDiskStoarge,
   deleteUserAvatar,
+  updateCurrentUser,
+  getUserSettings,
+  updateUserSettings,
+  deleteUser,
 } from "../controllers/user.controller.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
 import sendResponse from "../utils/response.util.js";
@@ -27,6 +31,11 @@ router.post(
   uploadToDiskStoarge
 );
 router.post("/deleteAvatar", isLoggedIn, deleteUserAvatar);
+router.put("/updateUserInfo", isLoggedIn, updateCurrentUser); //update user info
+router.get("/getUserSettings", isLoggedIn, getUserSettings); //default settings
+router.put("/putUserSettings", isLoggedIn, updateUserSettings); //change settings
+router.put("/deleteUser", isLoggedIn, deleteUser);   
+
 
 router.get(
   "/google",
