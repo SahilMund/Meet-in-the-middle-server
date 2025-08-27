@@ -8,6 +8,10 @@ import {
   logout,
   uploadToDiskStoarge,
   deleteUserAvatar,
+  updateCurrentUser,
+  getUserSettings,
+  updateUserSettings,
+  deleteUser,
 } from "../controllers/user.controller.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
 dotenv.config();
@@ -24,5 +28,8 @@ router.post(
   uploadToDiskStoarge
 );
 router.post("/deleteAvatar", isLoggedIn, deleteUserAvatar);
-
+router.put("/updateUserInfo", isLoggedIn, updateCurrentUser); //update user info
+router.get("/getUserSettings", isLoggedIn, getUserSettings); //default settings
+router.put("/putUserSettings", isLoggedIn, updateUserSettings); //change settings
+router.put("/deleteUser", isLoggedIn, deleteUser);   
 export default router;

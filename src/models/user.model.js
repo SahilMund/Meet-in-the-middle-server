@@ -20,11 +20,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "", // cloudinary url
     },
-    role: {
-      type: String,
-      enum: ["personal", "creator", "admin"],
-      default: "personal",
-    },
+
+    phone: { type: String, default: "" },
+    location: { type: String, default: "" },
+    bio: { type: String, default: "" },
   },
   { timestamps: true }
 );
