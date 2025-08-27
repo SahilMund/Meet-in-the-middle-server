@@ -1,6 +1,9 @@
 import OtpModel from "../models/otp.model.js";
 import UserModel from "../models/user.model.js";
-import { sendWelComeMail,sendVerificationEmail } from "../utils/sendMail.util.js";
+import {
+  sendWelComeMail,
+  sendVerificationEmail,
+} from "../utils/sendMail.util.js";
 
 const sendOTP = async (req, res) => {
   try {
@@ -20,7 +23,7 @@ const sendOTP = async (req, res) => {
       await otpData.save();
       console.log({ otpData });
     }
-    await sendVerificationEmail(email,otp);
+    await sendVerificationEmail(email, otp);
     res.status(201).json({ message: "OTP sent successfully" });
   } catch (error) {
     res.status(500).json({ message: "Failed to send OTP", error });

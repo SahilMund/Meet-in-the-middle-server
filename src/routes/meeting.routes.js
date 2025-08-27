@@ -28,4 +28,7 @@ router.get("/getDashBoardStats", isLoggedIn, dashboardStats);
 router.get("/getUpCommingMeetings", isLoggedIn, upcomingMeetings);
 router.get("/getRecentActivity", isLoggedIn, recentActivity);
 
+router.get("/dashboardStats", isLoggedIn, dashboardStats);
+router.get("/upcomingMeetings", isLoggedIn, upcomingMeetings);
+router.get("/recentActivity", isLoggedIn, recentActivity);
 export default router;

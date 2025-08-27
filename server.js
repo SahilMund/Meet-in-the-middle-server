@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import { rateLimit } from "express-rate-limit";
+import passport from "passport";
 
 import connectDB from "./src/configs/mongoose.js";
 import { logger } from "./src/middlewares/logger.js";
@@ -48,7 +49,7 @@ app.get("/", (req, res) => {
 });
 
 app.use(logger);
-
+app.use(passport.initialize());
 app.use("/api", limiter, routes);
 
 app.use("/api/verification", verificationRoutes);
