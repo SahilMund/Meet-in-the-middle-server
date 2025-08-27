@@ -11,13 +11,15 @@ import {
   dashboardStats,
   upcomingMeetings,
   getMeetingById,
-  recentActivity
+  recentActivity,
+  getPendingMeetings
 } from "../controllers/meeting.controller.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
 const router = express.Router();
 
 router.post("/createMeeting", isLoggedIn, createMeeting);
 router.get("/getMeetings", isLoggedIn, getMeetings);
+router.get("/getPendingMeetings", isLoggedIn, getPendingMeetings);
 router.get("/getSingleMeeting/:meetingId", isLoggedIn, getMeetingById);
 router.delete("/deleteMeeting/:meetingId", isLoggedIn, deleteMeeting);
 router.put("/editMeeting/:meetingId", isLoggedIn, editMeetingById);
