@@ -23,7 +23,6 @@ export const createMeeting = async (req, res) => {
     if (!title || !scheduledAt) {
       return sendResponse(res, "Title and scheduled time are required");
     }
-
     const { lat, lng, placeName } = creatorLocation;
     const creatorId = req.user?.id;
     const creatorEmail = req.user?.email;
@@ -142,8 +141,6 @@ export const getMeetings = async (req, res) => {
   }
 };
 
-
-
 export const getPendingMeetings = async (req, res) => {
   try {
     const email = req.user?.email;
@@ -188,12 +185,13 @@ export const getPendingMeetings = async (req, res) => {
       time: moment(m.scheduledAt).format("h:mmA"),
     }));
 
-    sendResponse(res, "Pending Meetings fetched successfully!", 200, { meetings });
+    sendResponse(res, "Pending Meetings fetched successfully!", 200, {
+      meetings,
+    });
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
 };
-
 
 export const deleteMeeting = async (req, res) => {
   try {
@@ -297,11 +295,11 @@ export const acceptMeeting = async (req, res) => {
     const participant = await Participant.findOne({
       meeting: meetingId,
       email,
-    });
-    if (participant.email === email)
+    }).populate("meeting");
+    if (participant.meeting.creator === email)
       return sendResponse(res, "You are the Creator of this room", 401);
 
-    if (!participant || participant.email !== email) {
+    if (!participant) {
       return sendResponse(res, "Participant not found", 404);
     }
     participant.status = "accepted";
@@ -324,11 +322,11 @@ export const rejectMeeting = async (req, res) => {
     const participant = await Participant.findOne({
       meeting: meetingId,
       email,
-    });
+    }).populate("meeting");
 
-    if (participant.email === email)
+    if (participant.meeting.creator === email)
       return sendResponse(res, "Createor Can't reject room ", 401);
-    if (!participant || participant.email !== email) {
+    if (!participant) {
       return sendResponse(res, "Participant not found", 404);
     }
     participant.status = "rejected";
@@ -349,7 +347,10 @@ export const conflicts = async (req, res) => {
       return sendResponse(res, "Meeting not found", 404);
     }
 
-    const myParticipations = await Participant.find({ email })
+    const myParticipations = await Participant.find({
+      email,
+      status: { $ne: "rejected" },
+    })
       .select("meeting")
       .populate("meeting");
 
@@ -392,7 +393,6 @@ export const dashboardStats = async (req, res) => {
         { path: "participants" },
       ],
     });
-    console.log({myParticipations},"=======================================")
     data.totalMeetings = myParticipations.length;
     let nv = Date.now();
     const upcomingmeetings = myParticipations.filter(

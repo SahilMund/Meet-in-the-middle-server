@@ -44,6 +44,18 @@ export const login = async (req, res) => {
     if (!user || !(await user.comparePassword(password))) {
       return sendResponse(res, "Invalid credentials", 401);
     }
+    userSettings
+      .findOneAndUpdate(
+        { userId: user._id },
+        {
+          isDeleted: {
+            deletedAt: null,
+            status: false,
+          },
+        },
+        { new: true }
+      )
+      .then((e) => console.log(e));
 
     const token = jwt.sign(
       {
