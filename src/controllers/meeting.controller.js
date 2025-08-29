@@ -124,7 +124,7 @@ export const getMeetings = async (req, res) => {
           { path: "creator", select: "name email" },
           {
             path: "participants",
-            populate: { path: "user", select: "name email avatar" },
+            populate: { path: "user", select: "name email avatar status" },
           },
         ],
       });
@@ -351,17 +351,20 @@ export const conflicts = async (req, res) => {
       email,
       status: { $ne: "rejected" },
     })
-      .select("meeting")
+      .select("meeting status")
       .populate("meeting");
 
-    const meetings = myParticipations.map((p) => p.meeting);
+    const meetings = myParticipations.map((p) => ({
+      meeting: p.meeting,
+      status: p.status,
+    }));
 
     const conflicts = meetings.filter((m) => {
-      if (!m || m._id.equals(currentMeeting._id)) return false;
+      if (!m || m.meeting._id.equals(currentMeeting._id)) return false;
 
       return (
-        m.scheduledAt < currentMeeting.endsAt &&
-        currentMeeting.scheduledAt < m.endsAt
+        m.meeting.scheduledAt < currentMeeting.endsAt &&
+        currentMeeting.scheduledAt < m.meeting.endsAt
       );
     });
 
@@ -369,7 +372,9 @@ export const conflicts = async (req, res) => {
       return sendResponse(res, "No conflicts found", 200, { conflicts: [] });
     }
 
-    return sendResponse(res, "Conflicts found", 200, { conflicts });
+    return sendResponse(res, "Conflicts found", 200, {
+      conflicts
+    });
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
@@ -425,7 +430,7 @@ export const dashboardStats = async (req, res) => {
       data.avgParticipants = totalPartcipants / myParticipations.length;
 
       const accepted = myParticipations.filter((p) => p.status === "accepted");
-      data.successRate = accepted.length / myParticipations.length;
+      data.successRate = (accepted.length / myParticipations.length).toFixed(2);
     }
     return sendResponse(res, "succesfully fetch the stats", 200, data);
   } catch (error) {

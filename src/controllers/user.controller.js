@@ -31,7 +31,10 @@ export const getUserInfo = async (req, res) => {
     id: user._id,
     role: user.role,
     name: user.name,
-    avartar: user.avatar,
+    avatar: user.avatar,
+    bio:user.bio,
+    phone:user.phone,
+    location:user.location,
     userSettings: userSettingsData,
   });
 };
@@ -112,6 +115,7 @@ export const loggedInUserInfo = async (req, res) => {
 
 //This is for user avatar upload new for first time
 export const uploadToDiskStoarge = async (req, res) => {
+  console.log(req)
   if (!req.file) {
     return sendResponse(res, "No file uploaded");
   }
@@ -173,7 +177,7 @@ export const uploadToDiskStoarge = async (req, res) => {
           console.error("Error deleting old avatar:", error);
         });
     }
-    return sendResponse(res, "File uploaded successfully", 200, data);
+    return sendResponse(res, "Profile uploaded successfully", 200, data);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "File upload failed" });
