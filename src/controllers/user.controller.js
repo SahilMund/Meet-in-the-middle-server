@@ -1,20 +1,22 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import Meeting from "../models/meeting.model.js";
+
 import jwt from "jsonwebtoken";
+import schedule from "node-schedule";
 import sharp from "sharp";
-import Participant from "../models/participant.model.js";
+
 import cloudinary from "../configs/cloudinary.js";
+import Meeting from "../models/meeting.model.js";
+import Participant from "../models/participant.model.js";
 import User from "../models/user.model.js";
+import userSettings from "../models/userSettings.mode.js";
 import { deleteAvatarFromCloudinary } from "../utils/deleteUserAvatarFromCloudinary.js";
 import sendResponse from "../utils/response.util.js";
-import userSettings from "../models/userSettings.mode.js";
 import {
   sendDeleteConformationMail,
   sendPermanentDeletionMail,
 } from "../utils/sendMail.util.js";
-import schedule from "node-schedule";
 
 export const getUserInfo = async (req, res) => {
   // Assuming req.user is set by the isLoggedIn middleware
@@ -32,9 +34,9 @@ export const getUserInfo = async (req, res) => {
     role: user.role,
     name: user.name,
     avatar: user.avatar,
-    bio:user.bio,
-    phone:user.phone,
-    location:user.location,
+    bio: user.bio,
+    phone: user.phone,
+    location: user.location,
     userSettings: userSettingsData,
   });
 };
@@ -115,7 +117,7 @@ export const loggedInUserInfo = async (req, res) => {
 
 //This is for user avatar upload new for first time
 export const uploadToDiskStoarge = async (req, res) => {
-  console.log(req)
+  console.log(req);
   if (!req.file) {
     return sendResponse(res, "No file uploaded");
   }

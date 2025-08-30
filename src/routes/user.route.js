@@ -34,8 +34,7 @@ router.post("/deleteAvatar", isLoggedIn, deleteUserAvatar);
 router.put("/updateUserInfo", isLoggedIn, updateCurrentUser); //update user info
 router.get("/getUserSettings", isLoggedIn, getUserSettings); //default settings
 router.put("/putUserSettings", isLoggedIn, updateUserSettings); //change settings
-router.put("/deleteUser", isLoggedIn, deleteUser);   
-
+router.put("/deleteUser", isLoggedIn, deleteUser);
 
 router.get(
   "/google",

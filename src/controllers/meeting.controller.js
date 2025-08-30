@@ -1,4 +1,5 @@
 import moment from "moment";
+
 import sendCancellationEmailHtml from "../emailTemplates/meetingCancellation.js";
 import sendInvitationEmailHtml from "../emailTemplates/meetingInvitation.js";
 import Meeting from "../models/meeting.model.js";
@@ -61,6 +62,7 @@ export const createMeeting = async (req, res) => {
 
           return {
             user: userId,
+            name: p.name,
             email: p.email,
             status: "pending",
             meeting: meeting._id,
@@ -70,13 +72,13 @@ export const createMeeting = async (req, res) => {
     //add meeying creator in paticipants
     allParticipants.push({
       user: creatorId,
+      name: user.name,
       email: creatorEmail,
       status: "accepted",
       location: { lat, lng, placeName } || {},
       meeting: meeting._id,
     });
 
-    // creator details
     const createdParticipants = await Participant.insertMany(allParticipants);
     meeting.participants = createdParticipants.map((p) => p._id);
     const updatedMeeting = await meeting.save();
@@ -132,9 +134,8 @@ export const getMeetings = async (req, res) => {
       return sendResponse(res, "No Meetings found", 200, { meetings: [] });
     }
 
-    const meetings = myParticipations.map((p) => p.meeting);
     sendResponse(res, "Meetings fetched successfully!", 200, {
-      meetings,
+      meetings: myParticipations,
     });
   } catch (error) {
     sendResponse(res, error.message, 500);
@@ -145,6 +146,7 @@ export const getPendingMeetings = async (req, res) => {
   try {
     const email = req.user?.email;
     let { pageNo, items } = req.query;
+
     pageNo = parseInt(pageNo) || 1;
     items = parseInt(items) || 10;
 
@@ -170,10 +172,11 @@ export const getPendingMeetings = async (req, res) => {
       return sendResponse(res, "No Meetings found", 200, { meetings: [] });
     }
 
-    // Map meetings into simplified objects
     const meetings = [
       ...new Map(
-        myParticipations.map((p) => [p.meeting._id.toString(), p.meeting])
+        myParticipations
+          .filter((p) => p.meeting)
+          .map((p) => [p.meeting._id.toString(), p.meeting])
       ).values(),
     ].map((m) => ({
       id: m._id,
@@ -181,8 +184,8 @@ export const getPendingMeetings = async (req, res) => {
       name: m.creator?.name || "Unknown",
       description: m.description,
       people: m.participants?.length || 0,
-      date: moment(m.scheduledAt).format("MMM DD"),
-      time: moment(m.scheduledAt).format("h:mmA"),
+      date: m.scheduledAt ? moment(m.scheduledAt).format("MMM DD") : "",
+      time: m.scheduledAt ? moment(m.scheduledAt).format("h:mmA") : "",
     }));
 
     sendResponse(res, "Pending Meetings fetched successfully!", 200, {
@@ -233,7 +236,9 @@ export const getMeetingById = async (req, res) => {
   try {
     const { meetingId } = req.params;
 
-    const meeting = await Meeting.findById(meetingId).populate("participants");
+    const meeting = await Meeting.findById(meetingId)
+      .populate("creator")
+      .populate("participants");
 
     if (!meeting) {
       return sendResponse(res, "Meeting not found", 404);
@@ -373,7 +378,7 @@ export const conflicts = async (req, res) => {
     }
 
     return sendResponse(res, "Conflicts found", 200, {
-      conflicts
+      conflicts,
     });
   } catch (error) {
     sendResponse(res, error.message, 500);

@@ -6,6 +6,7 @@ const participantSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+    name: String,
     email: {
       type: String,
       required: true,
@@ -32,7 +33,7 @@ const participantSchema = new Schema(
       },
     ],
   },
-  { timestamps:true }
+  { timestamps: true }
 );
 
 const Participant = mongoose.model("Participant", participantSchema);
