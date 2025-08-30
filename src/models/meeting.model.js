@@ -30,9 +30,9 @@ const meetingSchema = new mongoose.Schema(
       type: Date,
     },
     locationSuggestion: {
-      lat: { type: Number,default:null },
-      lng: { type: Number,default:null },
-      placeName: { type: String,default:null },
+      lat: { type: Number, default: null },
+      lng: { type: Number, default: null },
+      placeName: { type: String, default: null },
     },
   },
   { timestamps: true }

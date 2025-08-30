@@ -1,13 +1,10 @@
 import OtpModel from "../models/otp.model.js";
 import UserModel from "../models/user.model.js";
-
 import userSettings from "../models/userSettings.mode.js";
-
 import {
   sendWelComeMail,
   sendVerificationEmail,
 } from "../utils/sendMail.util.js";
-
 
 const sendOTP = async (req, res) => {
   try {

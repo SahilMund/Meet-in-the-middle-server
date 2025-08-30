@@ -48,8 +48,8 @@ export const sendMeetingInvitationMail = async ({
   try {
     const mailOptions = {
       from: process.env.NODE_MAILER_MAIL,
-      to: Array.isArray(to) ? to.map((p)=>p.email).join(",") : to,
-      cc: Array.isArray(cc) ? cc.map((p)=>p.email).join(",") : cc,
+      to: Array.isArray(to) ? to.map((p) => p.email).join(",") : to,
+      cc: Array.isArray(cc) ? cc.map((p) => p.email).join(",") : cc,
       subject: subject || "Meeting Invitation",
       html,
     };
