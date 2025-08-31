@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
-import mongoose from "mongoose";
-
+import mongoose, { Schema } from "mongoose";
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -19,6 +18,10 @@ const userSchema = new mongoose.Schema(
     avatar: {
       type: String,
       default: "", // cloudinary url
+    },
+    settings: {
+      type: Schema.Types.ObjectId,
+      ref: "userSettingsModel",
     },
 
     phone: { type: String, default: "" },

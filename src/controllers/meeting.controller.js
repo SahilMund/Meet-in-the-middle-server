@@ -1,12 +1,16 @@
 import moment from "moment";
-
+import schedule from "node-schedule";
 import sendCancellationEmailHtml from "../emailTemplates/meetingCancellation.js";
 import sendInvitationEmailHtml from "../emailTemplates/meetingInvitation.js";
 import Meeting from "../models/meeting.model.js";
 import Participant from "../models/participant.model.js";
 import User from "../models/user.model.js";
 import sendResponse from "../utils/response.util.js";
-import { sendMeetingInvitationMail } from "../utils/sendMail.util.js";
+import {
+  scheduleConfirmationRemainder,
+  sendEmail,
+  sendMeetingInvitationMail,
+} from "../utils/sendMail.util.js";
 
 // conflict controller is pending
 
@@ -377,9 +381,7 @@ export const conflicts = async (req, res) => {
       return sendResponse(res, "No conflicts found", 200, { conflicts: [] });
     }
 
-    return sendResponse(res, "Conflicts found", 200, {
-      conflicts,
-    });
+    return sendResponse(res, "Conflicts found", 200, { conflicts });
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
@@ -513,6 +515,96 @@ export const recentActivity = async (req, res) => {
     const allActivities = [...meetingActivities, ...participantActivities];
     allActivities.sort((a, b) => b.timestamp - a.timestamp);
     return sendResponse(res, "success", 200, allActivities);
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+
+export const scheduleMeetingReminder = async (req, res) => {
+  try {
+    const { meetingId } = req.body;
+    const meeting = await Meeting.findById(meetingId)
+      .select("title creator participants scheduledAt meetingLink")
+      .populate({
+        path: "participants",
+        select: "name email status user",
+        populate: {
+          path: "user",
+          select: "settings",
+          populate: {
+            path: "settings",
+            select: "emailNotifications",
+          },
+        },
+      })
+      .populate("creator", "name email")
+      .lean();
+    if (!meeting) {
+      return sendResponse(res, "meeting not found", 400, null);
+    }
+    const startTime = new Date(meeting.scheduledAt);
+
+    //filter participants
+    const participants = meeting.participants.filter(
+      (p) =>
+        p.status === "accepted" && p.user?.settings?.emailNotifications === true
+    );
+    const recipientEmails = participants.map((p) => p.user.email);
+    const remainder1Day = new Date(startTime.getTime() - 24 * 60 * 60 * 1000);
+    const remainder3Hours = new Date(startTime.getTime() - 3 * 60 * 60 * 1000);
+    schedule.scheduleJob(remainder1Day, async () => {
+      await sendEmail(
+        recipientEmails,
+        `Reminder: Meeting "${meeting.title}" is tomorrow`,
+        `Hello, you have a meeting "${meeting.title}" scheduled by ${meeting.creator.name} tomorrow.The meeting Link ${meeting.meetingLink}`
+      );
+    });
+
+    schedule.scheduleJob(remainder3Hours, async () => {
+      await sendEmail(
+        recipientEmails,
+        `Reminder: Meeting "${meeting.title}" starts in 3 hours`,
+        `Hello, your meeting "${meeting.title}" scheduled by ${meeting.creator.name} will start in 3 hours.The meeting Link ${meeting.meetingLink}`
+      );
+    });
+    return sendResponse(res, "remainders scheduled successfully", 200, {
+      totalPartcipants: participants.length,
+    });
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+
+export const confirmationRemainder = async (req, res) => {
+  try {
+    const { meetingId } = req.body;
+    const meeting = await Meeting.findById(meetingId)
+      .select("title creator participants scheduledAt meetingLink")
+      .populate({
+        path: "participants",
+        select: "name email status user",
+        populate: {
+          path: "user",
+          select: "settings",
+          populate: {
+            path: "settings",
+            select: "emailNotifications",
+          },
+        },
+      })
+      .populate("creator", "name email")
+      .lean();
+    if (!meeting) {
+      return sendResponse(res, "meeting not found", 400, null);
+    }
+    const startTime = new Date(meeting.scheduledAt);
+
+    //filter participants
+    const participants = meeting.participants.filter(
+      (p) =>
+        p.status === "pending" && p.user?.settings?.emailNotifications === true
+    );
+    await scheduleConfirmationRemainder(meeting, participants, startTime);
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
