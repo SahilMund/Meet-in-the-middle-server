@@ -13,6 +13,8 @@ import {
   getMeetingById,
   recentActivity,
   getPendingMeetings,
+  scheduleMeetingReminder,
+  confirmationRemainder,
 } from "../controllers/meeting.controller.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
 const router = express.Router();
@@ -31,4 +33,6 @@ router.get("/getUpCommingMeetings", isLoggedIn, upcomingMeetings);
 router.get("/getRecentActivity", isLoggedIn, recentActivity);
 router.get("/upcomingMeetings", isLoggedIn, upcomingMeetings);
 router.get("/recentActivity", isLoggedIn, recentActivity);
+router.get("/scheduleMeetingReminder", isLoggedIn, scheduleMeetingReminder);
+router.get("/confirmationRemainder", isLoggedIn, confirmationRemainder);
 export default router;

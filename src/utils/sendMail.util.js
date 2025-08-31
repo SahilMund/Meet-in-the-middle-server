@@ -1,5 +1,5 @@
 import { transporter } from "../configs/nodeMailerTransporter.js";
-
+import cron from "node-cron";
 import {
   accountDeletedMail,
   html,
@@ -89,4 +89,48 @@ export const sendPermanentDeletionMail = async (email) => {
   } catch (error) {
     throw new Error("Failed to send email - " + error);
   }
+};
+
+export const sendEmail = async (to, subject, text) => {
+  const mailOptions = {
+    from: process.env.NODE_MAILER_MAIL,
+    to: to,
+    subject: subject,
+    text,
+  };
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent:" + info.response);
+  } catch (error) {
+    throw new Error("Failed to send email - " + error);
+  }
+};
+
+export const scheduleConfirmationRemainder = async (
+  meeting,
+  participants,
+  startTime
+) => {
+  const task = cron.schedule("0 9 */2 * *", async () => {
+    const now = new Date();
+    if (now >= startTime) {
+      task.stop();
+      return;
+    }
+    for (let p of participants) {
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: p.email,
+        subject: `Reminder: Respond to meeting "${meeting.title}"`,
+        html: `
+          <p>Hello ${p.name},</p>
+          <p>You have a pending meeting scheduled at <b>${startTime.toLocaleString()}</b>.</p>
+          
+        `,
+      };
+
+      await transporter.sendMail(mailOptions);
+    }
+  });
+  task.start();
 };
