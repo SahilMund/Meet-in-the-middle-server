@@ -71,7 +71,8 @@ const verifyOTP = async (req, res) => {
     const userSettingsNew = await userSettings.create({
       userId: user._id,
     }); //creating user default settings
-
+    user.settings = userSettingsNew._id;
+    user.save().then();
     res.status(200).json({ message: "OTP verified successfully" });
     // res.status(200).json(userSettings);
   } catch (error) {
