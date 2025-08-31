@@ -3066,3 +3066,13 @@
 [2025-08-30T16:19:16.416Z] GET /api/meeting/getUpCommingMeetings?pageNo=1&items=5 | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
 [2025-08-30T16:19:30.748Z] GET /api/user/currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
 [2025-08-30T16:19:30.745Z] GET /api/meeting/getPendingMeetings?pageNo=1&items=10 | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-31T16:07:08.810Z] GET /api-docs/ | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-31T16:07:18.023Z] GET /api-docs/ | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-31T16:14:09.351Z] GET /api-docs/ | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-31T16:14:11.258Z] GET /api-docs/ | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-31T16:14:15.473Z] GET /api-docs/ | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-31T16:14:16.454Z] GET /api-docs/ | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-31T16:31:55.360Z] POST /login | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-31T16:35:41.555Z] GET /currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-31T16:41:09.605Z] GET /currUserInfo | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 
+[2025-08-31T16:51:20.347Z] GET /currUserInfo?id=1&name=mani | Status: 200 | IP: ::1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 

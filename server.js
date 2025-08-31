@@ -5,7 +5,7 @@ dotenv.config();
 import express from "express";
 import { rateLimit } from "express-rate-limit";
 import passport from "passport";
-
+import {swaggerUi, swaggerSpec} from "./src/configs/Swagger.js"
 import connectDB from "./src/configs/mongoose.js";
 import { logger } from "./src/middlewares/logger.js";
 import routes from "./src/routes/index.js";
@@ -24,6 +24,7 @@ const PORT = process.env.PORT || 8000;
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(
   cors({
@@ -34,6 +35,10 @@ app.use(
   })
 );
 
+app.listen(8000, () => {
+  console.log("Server running on http://localhost:5000");
+  console.log("Swagger docs available at http://localhost:5000/api-docs");
+});
 const limiter = rateLimit({
   windowMs: 60 * 60 * 10000,
   max: 1000,
