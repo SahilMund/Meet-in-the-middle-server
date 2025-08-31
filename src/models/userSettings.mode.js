@@ -3,6 +3,11 @@ import mongoose from "mongoose";
 const { Schema, Types, model } = mongoose;
 
 const userSettingsSchema = new Schema({
+  userId: {
+    type: Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   emailNotifications: {
     type: Boolean,
     default: true,

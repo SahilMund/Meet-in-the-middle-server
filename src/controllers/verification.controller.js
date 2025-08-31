@@ -39,7 +39,6 @@ const verifyOTP = async (req, res) => {
 
     // 1. Check OTP
     const otpData = await OtpModel.findOne({ email, otp });
-    console.log({ email, otp });
     if (!otpData) {
       return res.status(400).json({ message: "Invalid OTP" });
     }
