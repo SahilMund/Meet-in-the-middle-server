@@ -13,8 +13,8 @@ const participantSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "accepted", "rejected"],
-      default: "pending",
+      enum: ["Pending", "Accepted", "Rejected"],
+      default: "Pending",
     },
     location: {
       lat: { type: Number },
