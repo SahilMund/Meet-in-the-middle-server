@@ -338,7 +338,7 @@ export const rejectMeeting = async (req, res) => {
     if (!participant) {
       return sendResponse(res, "Participant not found", 404);
     }
-    participant.status = "rejected";
+    participant.status = "Rejected";
     await participant.save();
     sendResponse(res, "Participantion updated successfully!", 200, {});
   } catch (error) {
