@@ -85,7 +85,7 @@ router.post("/logout", isLoggedIn, logout);
 
 /**
  * @swagger
- * /currUserInfo:
+ * /user/currUserInfo:
  *   get:
  *     summary: Get current user info
  *     description: Fetches details of the currently authenticated user.

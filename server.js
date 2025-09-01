@@ -5,7 +5,7 @@ dotenv.config();
 import express from "express";
 import { rateLimit } from "express-rate-limit";
 import passport from "passport";
-import {swaggerUi, swaggerSpec} from "./src/configs/Swagger.js"
+import {swaggerUi, swaggerSpec} from "./src/configs/swagger.js"
 import connectDB from "./src/configs/mongoose.js";
 import { logger } from "./src/middlewares/logger.js";
 import routes from "./src/routes/index.js";
@@ -35,10 +35,7 @@ app.use(
   })
 );
 
-app.listen(8000, () => {
-  console.log("Server running on http://localhost:5000");
-  console.log("Swagger docs available at http://localhost:5000/api-docs");
-});
+
 const limiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 1000,
@@ -61,4 +58,5 @@ app.use("/api/verification", verificationRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
 });

@@ -5,13 +5,18 @@ const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Meet in Middle Api documentation",
+      title: "Meet in the middle API docs",
       version: "1.0.0",
       description: "API documentation with Swagger",
     },
     servers: [
       {
-        url: "http://localhost:8000",
+        url: "http://localhost:8000/api",
+         description: "Local server",
+      },
+       {
+        url: "http://localhost:8000/api", //TODO: Need to add post deployment
+         description: "Production server",
       },
     ],
     components: {
