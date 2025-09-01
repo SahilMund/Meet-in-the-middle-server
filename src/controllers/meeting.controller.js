@@ -68,7 +68,7 @@ export const createMeeting = async (req, res) => {
             user: userId,
             name: p.name,
             email: p.email,
-            status: "pending",
+            status: "Pending",
             meeting: meeting._id,
           };
         }),
@@ -78,7 +78,7 @@ export const createMeeting = async (req, res) => {
       user: creatorId,
       name: user.name,
       email: creatorEmail,
-      status: "accepted",
+      status: "Accepted",
       location: { lat, lng, placeName } || {},
       meeting: meeting._id,
     });
@@ -157,7 +157,7 @@ export const getPendingMeetings = async (req, res) => {
     // Fetch participations
     const myParticipations = await Participant.find({
       email,
-      status: "pending",
+      status: "Pending",
     })
       .skip((pageNo - 1) * items)
       .limit(items)
@@ -277,16 +277,16 @@ export const editMeetingById = async (req, res) => {
       meetingLink: meeting.meetingLink,
     });
 
-    sendMeetingInvitationMail({
-      to: "",
-      ccc: meeting.participants,
-      subject: `Meeting Invitation from ${meeting.creator}`,
-      html,
-    })
-      .then()
-      .catch((error) => {
-        console.error("Error sending meeting invitation:", error);
-      });
+    // sendMeetingInvitationMail({
+    //   to: "",
+    //   ccc: meeting.participants,
+    //   subject: `Meeting Invitation from ${meeting.creator}`,
+    //   html,
+    // })
+    //   .then()
+    //   .catch((error) => {
+    //     console.error("Error sending meeting invitation:", error);
+    //   });
 
     sendResponse(res, "Meeting updated successfully!", 200, {
       meeting: updatedMeeting,
@@ -311,7 +311,7 @@ export const acceptMeeting = async (req, res) => {
     if (!participant) {
       return sendResponse(res, "Participant not found", 404);
     }
-    participant.status = "accepted";
+    participant.status = "Accepted";
     participant.location.lat = lat;
     participant.location.lng = lng;
     participant.location.placeName = placeName;
@@ -338,7 +338,7 @@ export const rejectMeeting = async (req, res) => {
     if (!participant) {
       return sendResponse(res, "Participant not found", 404);
     }
-    participant.status = "rejected";
+    participant.status = "Rejected";
     await participant.save();
     sendResponse(res, "Participantion updated successfully!", 200, {});
   } catch (error) {
@@ -358,7 +358,7 @@ export const conflicts = async (req, res) => {
 
     const myParticipations = await Participant.find({
       email,
-      status: { $ne: "rejected" },
+      status: { $ne: "Rejected" },
     })
       .select("meeting status")
       .populate("meeting");
@@ -413,7 +413,7 @@ export const dashboardStats = async (req, res) => {
     data.upcomingmeetings = upcomingmeetings.length;
 
     const pendingInvations = myParticipations.filter(
-      (p) => p.status === "pending"
+      (p) => p.status === "Pending"
     );
     data.pendingInvations = pendingInvations.length;
 
@@ -436,7 +436,7 @@ export const dashboardStats = async (req, res) => {
       }, 0);
       data.avgParticipants = totalPartcipants / myParticipations.length;
 
-      const accepted = myParticipations.filter((p) => p.status === "accepted");
+      const accepted = myParticipations.filter((p) => p.status === "Accepted");
       data.successRate = (accepted.length / myParticipations.length).toFixed(2);
     }
     return sendResponse(res, "succesfully fetch the stats", 200, data);
@@ -547,7 +547,7 @@ export const scheduleMeetingReminder = async (req, res) => {
     //filter participants
     const participants = meeting.participants.filter(
       (p) =>
-        p.status === "accepted" && p.user?.settings?.emailNotifications === true
+        p.status === "Accepted" && p.user?.settings?.emailNotifications === true
     );
     const recipientEmails = participants.map((p) => p.user.email);
     const remainder1Day = new Date(startTime.getTime() - 24 * 60 * 60 * 1000);
@@ -602,7 +602,7 @@ export const confirmationRemainder = async (req, res) => {
     //filter participants
     const participants = meeting.participants.filter(
       (p) =>
-        p.status === "pending" && p.user?.settings?.emailNotifications === true
+        p.status === "Pending" && p.user?.settings?.emailNotifications === true
     );
     await scheduleConfirmationRemainder(meeting, participants, startTime);
   } catch (error) {

@@ -24,7 +24,9 @@ router.get("/getMeetings", isLoggedIn, getMeetings);
 router.get("/getPendingMeetings", isLoggedIn, getPendingMeetings);
 router.get("/getMeetingById/:meetingId", isLoggedIn, getMeetingById);
 router.delete("/deleteMeeting/:meetingId", isLoggedIn, deleteMeeting);
+
 router.put("/editMeeting/:meetingId", isLoggedIn, editMeetingById);
+
 router.put("/acceptMeeting", isLoggedIn, acceptMeeting);
 router.put("/rejectMeeting", isLoggedIn, rejectMeeting);
 router.get("/conflicts/:meetingId", isLoggedIn, conflicts);
