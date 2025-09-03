@@ -14,6 +14,7 @@ import {
   getUserSettings,
   updateUserSettings,
   deleteUser,
+  refreshAccessToken,
 } from "../controllers/user.controller.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
 import sendResponse from "../utils/response.util.js";
@@ -82,7 +83,6 @@ router.post("/login", login);
  */
 router.post("/logout", isLoggedIn, logout);
 
-
 /**
  * @swagger
  * /user/currUserInfo:
@@ -122,7 +122,6 @@ router.post("/logout", isLoggedIn, logout);
  *                     user:
  *                       $ref: '#/components/schemas/User'
  */
-
 
 router.get("/currUserInfo", isLoggedIn, getUserInfo);
 
@@ -247,4 +246,5 @@ router.get(
   }
 );
 
+router.post("/refreshAccessToken", refreshAccessToken);
 export default router;

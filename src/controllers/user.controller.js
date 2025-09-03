@@ -42,7 +42,7 @@ export const getUserInfo = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, rememberMe } = req.body;
   try {
     const user = await User.findOne({ email });
 
@@ -66,6 +66,7 @@ export const login = async (req, res) => {
       {
         id: user._id,
         email: user.email,
+        rememberMe,
       },
       process.env.JWT_SECRET_KEY,
       { expiresIn: process.env.JWT_EXPIRY }
@@ -74,9 +75,22 @@ export const login = async (req, res) => {
       httpOnly: true,
       // secure: true, //uncomment before deployment
     };
+    if (rememberMe) {
+      options.maxAge = 2 * 24 * 60 * 60 * 1000;
+    }
 
+    //refresh token
+    const refreshToken = jwt.sign(
+      { id: user._id, email: user.email, rememberMe },
+      process.env.JWT_REFRESH_SECRET_KEY,
+      { expiresIn: "30d" }
+    );
     res.cookie("token", token, options);
-
+    const refreshOptions = {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    };
+    res.cookie("refreshToken", refreshToken, refreshOptions);
     return sendResponse(res, "User logged in Successfully", 200, {
       user,
       token,
@@ -316,5 +330,36 @@ export const deleteUser = async (req, res) => {
     );
   } catch (error) {
     sendResponse(res, "Something went wrong", 500);
+  }
+};
+
+export const refreshAccessToken = async (req, res) => {
+  const { refreshToken } = req.cookies;
+  if (!refreshToken) {
+    return sendResponse(res, "No refresh token provided", 401);
+  }
+  try {
+    const decoded = jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET_KEY
+    );
+    const { rememberMe } = decoded;
+    const newAccessToken = jwt.sign(
+      { id: decoded.id, email: decoded.email },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: process.env.JWT_EXPIRY }
+    );
+    const options = {
+      httpOnly: true,
+    };
+    if (rememberMe) {
+      options.maxAge = 2 * 24 * 60 * 60 * 1000;
+    }
+    res.cookie("token", newAccessToken, options);
+    return sendResponse(res, "Token refreshed successfully", 200, {
+      token: newAccessToken,
+    });
+  } catch (error) {
+    return sendResponse(res, error.message, 403);
   }
 };
