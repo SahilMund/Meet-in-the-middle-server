@@ -1,10 +1,17 @@
+import crypto from "crypto";
+
+import dotenv from "dotenv";
 import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as FacebookStrategy } from "passport-facebook";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 import User from "../models/user.model.js";
-import dotenv from "dotenv";
+
 dotenv.config();
+
+const baseCbUrl = `http://localhost:${process.env.PORT}`;
+
+// Common verify callback
 const verifyCb = async (accessToken, refreshToken, profile, done) => {
   try {
     const email =
@@ -14,59 +21,57 @@ const verifyCb = async (accessToken, refreshToken, profile, done) => {
 
     const name = profile.displayName || "No Name";
     const avatar =
-      profile.photos && profile.photos.length > 0
-        ? profile.photos[0].value
-        : "";
-    console.log("profile", profile);
-    // const user = await User.findOne({ email: profile.email[0].value });
+      profile.photos && profile.photos.length > 0 ? profile.photos[0].value : "";
+
     let user = await User.findOne({ email });
+
     if (!user) {
+      const randomPassword = crypto.randomBytes(16).toString("hex"); // secure random pw
       user = await User.create({
         email,
         name,
-        password,
+        password: randomPassword,
         avatar,
         isOAuth: true,
         authProvider: profile.provider,
       });
     }
-    done(null, user);
+
+    return done(null, user);
   } catch (error) {
-    console.log(error);
-    done(error, null);
+    console.error("OAuth verification error:", error);
+    return done(error, null);
   }
 };
-// google auth
-console.log(
-  process.env.GOOGLE_CLIENTID,
-  process.env.GOOGLE_CLIENTSECRET,
-  process.env.GOOGLE_CALLBACK
-);
+
+// Google strategy
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENTID,
       clientSecret: process.env.GOOGLE_CLIENTSECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK,
+      callbackURL: `${baseCbUrl}/${process.env.GOOGLE_CALLBACK}`, 
     },
     verifyCb
   )
 );
-// facebook sso
+
+// Facebook strategy
 passport.use(
   new FacebookStrategy(
     {
       clientID: process.env.FACEBOOK_CLIENTID,
       clientSecret: process.env.FACEBOOK_CLIENTSECRET,
-      callbackURL: process.env.FACEBOOK_CALLBACK,
+      callbackURL: `${baseCbUrl}/${process.env.FACEBOOK_CALLBACK}`,
       profileFields: ["id", "emails", "name", "displayName", "photos"],
     },
     verifyCb
   )
 );
 
+// Only needed if using sessions
 passport.serializeUser((user, done) => {
-  done(null, user._id); // store user id in session
+  done(null, user._id);
 });
 
 passport.deserializeUser(async (id, done) => {

@@ -17,7 +17,6 @@ import {
   refreshAccessToken,
 } from "../controllers/user.controller.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
-import sendResponse from "../utils/response.util.js";
 
 dotenv.config();
 
@@ -234,17 +233,65 @@ router.get(
       { expiresIn: "7d" }
     );
 
-    const options = { httpOnly: true };
-    res.cookie("token", token, options);
 
-    return sendResponse(res, "User logged in Successfully", 200, {
-      data: { token, user: req.user },
-      success: true,
-      message: "USER logged in with google successfully !!",
-      redirectUrl: `http://localhost:5173/`,
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // only HTTPS in prod
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
+
+
+ // Redirect frontend, let it fetch /currUserInfo with the cookie
+    res.redirect(process.env.FRONTEND_URL || "http://localhost:5173/home");
+  }
+);
+
+/**
+ * @swagger
+ * /facebook:
+ *   get:
+ *     summary: Facebook login
+ *     description: Redirects user to Facebook authentication.
+ */
+router.get(
+  "/facebook",
+  passport.authenticate("facebook", { scope: ["email"] }) // request email explicitly
+);
+
+/**
+ * @swagger
+ * /facebook/callback:
+ *   get:
+ *     summary: Facebook callback
+ *     description: Handles Facebook authentication callback and returns JWT.
+ */
+router.get(
+  "/facebook/callback",
+  passport.authenticate("facebook", { session: false }),
+  (req, res) => {
+    const token = jwt.sign(
+      {
+        email: req.user.email,
+        name: req.user.name,
+      },
+      process.env.SECRET_KEY,
+      { expiresIn: "7d" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false, // only HTTPS in prod
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+
+ // Redirect frontend, let it fetch /currUserInfo with the cookie
+    res.redirect("http://localhost:5173/home");
   }
 );
 
 router.post("/refreshAccessToken", refreshAccessToken);
+
 export default router;
