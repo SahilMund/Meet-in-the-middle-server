@@ -3,9 +3,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
-import { rateLimit } from "express-rate-limit";
+// import { rateLimit } from "express-rate-limit";
 import passport from "passport";
-import {swaggerUi, swaggerSpec} from "./src/configs/swagger.js"
+import { swaggerUi, swaggerSpec } from "./src/configs/swagger.js";
 import connectDB from "./src/configs/mongoose.js";
 import { logger } from "./src/middlewares/logger.js";
 import routes from "./src/routes/index.js";
@@ -35,12 +35,11 @@ app.use(
   })
 );
 
-
-const limiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 1000,
-  message: "Too many requests, please try again later.",
-});
+// const limiter = rateLimit({
+//   windowMs: 60 * 60 * 1000,
+//   max: 1000,
+//   message: "Too many requests, please try again later.",
+// });
 
 connectDB().then(() => {
   console.log("✅ MongoDB Connected Successfully");
@@ -52,7 +51,7 @@ app.get("/", (req, res) => {
 
 app.use(logger);
 app.use(passport.initialize());
-app.use("/api", limiter, routes);
+app.use("/api", routes);
 
 app.use("/api/verification", verificationRoutes);
 
