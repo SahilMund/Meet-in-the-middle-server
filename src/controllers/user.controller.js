@@ -83,7 +83,7 @@ export const login = async (req, res) => {
     const refreshToken = jwt.sign(
       { id: user._id, email: user.email, rememberMe },
       process.env.JWT_REFRESH_SECRET_KEY,
-      { expiresIn: "30d" }
+      { expiresIn: process.env.JWT_REFRESH_EXPIRY }
     );
     res.cookie("token", token, options);
     const refreshOptions = {
@@ -343,19 +343,31 @@ export const refreshAccessToken = async (req, res) => {
       refreshToken,
       process.env.JWT_REFRESH_SECRET_KEY
     );
-    const { rememberMe } = decoded;
-    const newAccessToken = jwt.sign(
-      { id: decoded.id, email: decoded.email },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: process.env.JWT_EXPIRY }
+    const { id, email, rememberMe } = decoded;
+    const newAccessToken = jwt.sign({ id, email }, process.env.JWT_SECRET_KEY, {
+      expiresIn: process.env.JWT_EXPIRY,
+    });
+    const newRefreshToken = jwt.sign(
+      { id, email, rememberMe },
+      process.env.JWT_REFRESH_SECRET_KEY,
+      { expiresIn: process.env.JWT_REFRESH_EXPIRY }
     );
     const options = {
       httpOnly: true,
+      secure: true,
+      sameSite: "Strict",
+    };
+    const refreshOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Strict",
     };
     if (rememberMe) {
       options.maxAge = 2 * 24 * 60 * 60 * 1000;
+      refreshOptions.maxAge = 7 * 24 * 60 * 60 * 1000;
     }
     res.cookie("token", newAccessToken, options);
+    res.cookie("refreshToken", newRefreshToken, refreshOptions);
     return sendResponse(res, "Token refreshed successfully", 200, {
       token: newAccessToken,
     });
