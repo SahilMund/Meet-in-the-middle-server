@@ -18,7 +18,7 @@ import {
 } from "../controllers/user.controller.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const router = express.Router();
 

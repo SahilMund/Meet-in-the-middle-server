@@ -7,7 +7,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 import User from "../models/user.model.js";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const baseCbUrl = `http://localhost:${process.env.PORT}`;
 
