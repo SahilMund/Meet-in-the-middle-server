@@ -82,7 +82,9 @@ router.post("/login", login);
  *         description: Successful logout
  */
 router.post("/logout", isLoggedIn, logout);
-
+router.get("/test-error", (req, res) => {
+  throw new Error("Forced crash");
+});
 /**
  * @swagger
  * /user/currUserInfo:
