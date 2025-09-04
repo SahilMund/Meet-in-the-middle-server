@@ -9,8 +9,6 @@ import User from "../models/user.model.js";
 
 dotenv.config({ quiet: true });
 
-const baseCbUrl = `http://localhost:${process.env.PORT}`;
-
 // Common verify callback
 const verifyCb = async (accessToken, refreshToken, profile, done) => {
   try {
@@ -21,7 +19,9 @@ const verifyCb = async (accessToken, refreshToken, profile, done) => {
 
     const name = profile.displayName || "No Name";
     const avatar =
-      profile.photos && profile.photos.length > 0 ? profile.photos[0].value : "";
+      profile.photos && profile.photos.length > 0
+        ? profile.photos[0].value
+        : "";
 
     let user = await User.findOne({ email });
 
@@ -50,7 +50,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENTID,
       clientSecret: process.env.GOOGLE_CLIENTSECRET,
-      callbackURL: `${baseCbUrl}/${process.env.GOOGLE_CALLBACK}`, 
+      callbackURL: process.env.GOOGLE_CALLBACK,
     },
     verifyCb
   )
@@ -62,7 +62,7 @@ passport.use(
     {
       clientID: process.env.FACEBOOK_CLIENTID,
       clientSecret: process.env.FACEBOOK_CLIENTSECRET,
-      callbackURL: `${baseCbUrl}/${process.env.FACEBOOK_CALLBACK}`,
+      callbackURL: process.env.FACEBOOK_CALLBACK,
       profileFields: ["id", "emails", "name", "displayName", "photos"],
     },
     verifyCb
