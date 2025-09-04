@@ -4,12 +4,14 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import passport from "passport";
+import oAuth from './src/configs/passport.js'
+// import { rateLimit } from "express-rate-limit";
+
 import { swaggerUi, swaggerSpec } from "./src/configs/swagger.js";
 import connectDB from "./src/configs/mongoose.js";
 import { logger } from "./src/middlewares/logger.js";
 import routes from "./src/routes/index.js";
 import verificationRoutes from "./src/routes/verificationOTP.route.js";
-
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -20,6 +22,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// const limiter = rateLimit({
+//   windowMs: 60 * 60 * 1000,
+//   max: 1000,
+//   message: "Too many requests, please try again later.",
+// });
 
 app.use(
   cors({
