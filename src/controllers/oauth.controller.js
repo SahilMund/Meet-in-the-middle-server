@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js"; // adjust path as needed
+import { toMs } from "../utils/msConverter.util.js";
 
 // helper to issue tokens + set cookies
 const issueTokensAndRedirect = (res, user) => {
@@ -20,7 +21,7 @@ const issueTokensAndRedirect = (res, user) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: toMs("7d"),
   });
 
   // Refresh Token cookie
@@ -28,7 +29,7 @@ const issueTokensAndRedirect = (res, user) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    maxAge: toMs("30d"), // 30 days
   });
 
   // redirect to frontend
@@ -37,14 +38,14 @@ const issueTokensAndRedirect = (res, user) => {
 
 export const oauthCallback = async (req, res) => {
   try {
-    const { email, name } = req.user;
+    const { email, name, provider } = req.user;
 
     // check if user exists
     let foundUser = await User.findOne({ email });
 
     // optional: create user if not found
     if (!foundUser) {
-      foundUser = await User.create({ email, name });
+      foundUser = await User.create({ email, name, provider });
     }
 
     return issueTokensAndRedirect(res, foundUser);
