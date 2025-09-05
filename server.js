@@ -6,7 +6,7 @@ dotenv.config({ quiet: true });
 import express from "express";
 import passport from "passport";
 import oAuth from "./src/configs/passport.js";
-// import { rateLimit } from "express-rate-limit";
+import { rateLimit } from "express-rate-limit";
 
 import { swaggerUi, swaggerSpec } from "./src/configs/swagger.js";
 import connectDB from "./src/configs/mongoose.js";
@@ -23,11 +23,12 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// const limiter = rateLimit({
-//   windowMs: 60 * 60 * 1000,
-//   max: 1000,
-//   message: "Too many requests, please try again later.",
-// });
+const limiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 1000,
+  message: "Too many requests, please try again later.",
+  skip: () => process.env.NODE_ENV !== "production", // 👈 disables in dev
+});
 
 app.use(
   cors({
@@ -45,7 +46,7 @@ app.get("/", (req, res) => {
   res.send("API is working!");
 });
 
-app.use("/api", routes);
+app.use("/api", limiter, routes);
 app.use("/api/verification", verificationRoutes);
 
 app.use((req, res) => {

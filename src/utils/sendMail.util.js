@@ -1,4 +1,4 @@
-import { transporter } from "../configs/nodeMailerTransporter.js";
+import { transporter } from "../configs/nodeMailer.js";
 import cron from "node-cron";
 import {
   accountDeletedMail,
