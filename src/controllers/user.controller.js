@@ -20,6 +20,7 @@ import {
 } from "../utils/sendMail.util.js";
 import { magicLinkMail } from "../utils/nodemailerHtml.js";
 import { getDeviceInfo } from "../utils/deviceInfo.js";
+import newDeviceLoginTemplate from "../emailTemplates/newDeviceLoginTemplete.js";
 
 export const getUserInfo = async (req, res) => {
   // Assuming req.user is set by the isLoggedIn middleware
@@ -75,15 +76,7 @@ export const login = async (req, res) => {
       await sendMagicEmail(
         user.email,
         "New Device Login Alert",
-        `<p>Hello ${user.name},</p>
-     <p>A login was detected from a new device:</p>
-     <ul>
-       <li><b>Device:</b> ${deviceInfo.device}</li>
-       <li><b>Browser:</b> ${deviceInfo.browser}</li>
-       <li><b>OS:</b> ${deviceInfo.os}</li>
-       <li><b>IP:</b> ${deviceInfo.ip}</li>
-     </ul>
-     <p>If this wasn’t you, please reset your password immediately.</p>`
+        newDeviceLoginTemplate(deviceInfo,user.name)
       );
     }
     user.lastLoginDevice = deviceInfo;
