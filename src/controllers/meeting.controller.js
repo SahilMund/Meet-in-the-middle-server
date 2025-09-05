@@ -12,6 +12,7 @@ import {
   sendMeetingInvitationMail,
 } from "../utils/sendMail.util.js";
 import { createGoogleCalendarEvent } from "./google-calendar.controller.js";
+import { sendPushToSubscribers } from "../controllers/notifications.controller.js";
 
 // conflict controller is pending
 
@@ -117,6 +118,17 @@ export const createMeeting = async (req, res) => {
       creatorEmail,
       participants,
     });
+
+    // ✅ 6. Push notification to participants
+    const payload = {
+      title: "New Meeting Scheduled",
+      body: `Meeting "${title}" created by ${hostName}`,
+      url: meeting.meetingLink,
+    };
+
+    // Send push to all participant emails
+    const participantEmails = allParticipants.map((p) => p.email);
+    sendPushToSubscribers(payload, participantEmails);
 
     return sendResponse(res, "Meeting created successfully", 201, {
       meeting: updatedMeeting,
