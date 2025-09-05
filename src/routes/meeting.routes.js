@@ -15,6 +15,7 @@ import {
   getPendingMeetings,
   scheduleMeetingReminder,
   confirmationRemainder,
+  calculateEquidistantPoint,
 } from "../controllers/meeting.controller.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
 const router = express.Router();
@@ -35,4 +36,5 @@ router.get("/upcomingMeetings", isLoggedIn, upcomingMeetings);
 router.get("/recentActivity", isLoggedIn, recentActivity);
 router.get("/scheduleMeetingReminder", isLoggedIn, scheduleMeetingReminder);
 router.get("/confirmationRemainder", isLoggedIn, confirmationRemainder);
+router.get("/calculateEquidistantPoint/:meetingId", isLoggedIn, calculateEquidistantPoint);
 export default router;

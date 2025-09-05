@@ -609,3 +609,121 @@ export const confirmationRemainder = async (req, res) => {
     sendResponse(res, error.message, 500);
   }
 };
+export const calculateEquidistantPoint = async (req, res) => {
+  try {
+    const { meetingId } = req.params;
+    const meeting = await Meeting.findById(meetingId).populate(
+      "participants",
+      "location status"
+    );
+    if (!meeting) {
+      return sendResponse(res, "meeting not found", 400, null);
+    }
+    const acceptedParticipants = meeting.participants.filter(
+      (p) => p.status === "accepted" && p.location?.lat && p.location?.lng
+    );
+    if (acceptedParticipants.length < 2) {
+      return sendResponse(res, "No accepted participants with location", 400);
+    }
+    const totalLat = acceptedParticipants.reduce(
+      (sum, p) => sum + p.location.lat,
+      0
+    );
+    const totalLng = acceptedParticipants.reduce(
+      (sum, p) => sum + p.location.lng,
+      0
+    );
+    const equidistantPoint = {
+      lat: totalLat / acceptedParticipants.length,
+      lng: totalLng / acceptedParticipants.length,
+    };
+    return sendResponse(res, "success", 200, { equidistantPoint });
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+
+export const acceptedParticipantsLocations = async (req, res) => {
+  try {
+    const { meetingId } = req.params;
+    const meeting = await Meeting.findById(meetingId).populate(
+      "participants",
+      "location status name email"
+    );
+    if (!meeting) {
+      return sendResponse(res, "meeting not found", 400, null);
+    }
+    const locations = meeting.participants
+      .filter((p) => p.status === "accepted" && p.location?.lat && p.location?.lng)
+      .map((p) => ({
+        name: p.name,
+        email: p.email,
+        lat: p.location.lat,
+        lng: p.location.lng,
+        placeName: p.location.placeName || "Unknown",
+      }));
+    return sendResponse(res, "success", 200, { locations });
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+
+export const nearByPlaces = async (req, res) => {
+  try {
+    const { meetingId } = req.params;
+    const { type } = req.query;
+    const meeting = await Meeting
+      .findById(meetingId)
+      .populate("participants", "location status");
+    if (!meeting) {
+      return sendResponse(res, "meeting not found", 400, null);
+    }
+    const acceptedParticipants = meeting.participants.filter(
+      (p) => p.status === "accepted" && p.location?.lat && p.location?.lng
+    );
+    if (acceptedParticipants.length < 2) {
+      return sendResponse(res, "No accepted participants with location", 400);
+    }
+    const totalLat = acceptedParticipants.reduce(
+      (sum, p) => sum + p.location.lat,
+      0
+    );
+    const totalLng = acceptedParticipants.reduce(
+      (sum, p) => sum + p.location.lng,
+      0
+    );
+    const equidistantPoint = {
+      lat: totalLat / acceptedParticipants.length,
+      lng: totalLng / acceptedParticipants.length,
+    };
+    //save equidistant point in meeting schema 
+    const apiKey = import.meta.env.GOOGLE_PLACES_API_KEY;
+    if (!apiKey) {
+      return sendResponse(res, "Google Places API key not configured", 500, null);
+    }
+    const radius = 5000;  // 5 km radius
+    const placeType = type || "restaurant";
+    const googlePlacesUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${equidistantPoint.lat},${equidistantPoint.lng}&radius=${radius}&type=${placeType}&key=${apiKey}`; 
+    const response = await fetch(googlePlacesUrl);
+    const data = await response.json();
+    if (data.status !== "OK") {
+      return sendResponse(res, "Error fetching nearby places", 500, null);
+    }
+    const places = data.results.map((place) => ({
+      name: place.name,
+      address: place.vicinity,
+      location: place.geometry.location,
+      placeId: place.place_id,
+      rating: place.rating,
+      userRatingsTotal: place.user_ratings_total,
+      
+    }));
+    //save places in meeting schema
+    return sendResponse(res, "success", 200, { places });
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+
+};
+
+

@@ -72,6 +72,7 @@ export const login = async (req, res) => {
     );
     const options = {
       httpOnly: true,
+      maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
       // secure: true, //uncomment before deployment
     };
 
