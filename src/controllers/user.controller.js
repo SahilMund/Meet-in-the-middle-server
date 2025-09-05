@@ -73,7 +73,7 @@ export const login = async (req, res) => {
     );
     const options = {
       httpOnly: true,
-      // secure: true, //uncomment before deployment
+      secure: process.env.NODE_ENV === "production",
     };
     if (rememberMe) {
       options.maxAge = 2 * 24 * 60 * 60 * 1000;
@@ -104,13 +104,17 @@ export const logout = async (req, res) => {
   try {
     const options = {
       httpOnly: true,
-      // secure: true, //uncomment before deployment
+      secure: process.env.NODE_ENV === "production", // enable HTTPS only in prod
+      sameSite: "strict",
+      maxAge: 0, // expire immediately
     };
+
     res.cookie("token", "", options);
+    res.cookie("refreshToken", "", options);
 
     return sendResponse(res, "User logged out successfully", 200);
   } catch (error) {
-    sendResponse(res, "Something went wrong", 500);
+    return sendResponse(res, "Something went wrong", 500);
   }
 };
 
@@ -354,12 +358,12 @@ export const refreshAccessToken = async (req, res) => {
     );
     const options = {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
     };
     const refreshOptions = {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
     };
     if (rememberMe) {
