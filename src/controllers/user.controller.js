@@ -17,6 +17,7 @@ import {
   sendDeleteConformationMail,
   sendPermanentDeletionMail,
 } from "../utils/sendMail.util.js";
+import { toMs } from "../utils/msConverter.util.js";
 
 export const getUserInfo = async (req, res) => {
   // Assuming req.user is set by the isLoggedIn middleware
@@ -74,10 +75,8 @@ export const login = async (req, res) => {
     const options = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      maxAge: rememberMe ? toMs("2d") : toMs("4h"), // shorter if not remembered
     };
-    if (rememberMe) {
-      options.maxAge = 2 * 24 * 60 * 60 * 1000;
-    }
 
     //refresh token
     const refreshToken = jwt.sign(
@@ -88,7 +87,7 @@ export const login = async (req, res) => {
     res.cookie("token", token, options);
     const refreshOptions = {
       httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
+      maxAge: toMs("30d"),
     };
     res.cookie("refreshToken", refreshToken, refreshOptions);
     return sendResponse(res, "User logged in Successfully", 200, {
@@ -342,36 +341,44 @@ export const refreshAccessToken = async (req, res) => {
   if (!refreshToken) {
     return sendResponse(res, "No refresh token provided", 401);
   }
+
   try {
     const decoded = jwt.verify(
       refreshToken,
       process.env.JWT_REFRESH_SECRET_KEY
     );
-    const { id, email, rememberMe } = decoded;
+    const { id, email } = decoded;
+
+    // New Access Token
     const newAccessToken = jwt.sign({ id, email }, process.env.JWT_SECRET_KEY, {
       expiresIn: process.env.JWT_EXPIRY,
     });
+
+    // New Refresh Token (optional, you can also just reuse the old one until expiry)
     const newRefreshToken = jwt.sign(
-      { id, email, rememberMe },
+      { id, email },
       process.env.JWT_REFRESH_SECRET_KEY,
       { expiresIn: process.env.JWT_REFRESH_EXPIRY }
     );
+
+    // Cookie options
     const options = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
+      maxAge: toMs("2d"), // access token cookie life
     };
+
     const refreshOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
+      maxAge: toMs("7d"), // refresh token cookie life
     };
-    if (rememberMe) {
-      options.maxAge = 2 * 24 * 60 * 60 * 1000;
-      refreshOptions.maxAge = 7 * 24 * 60 * 60 * 1000;
-    }
+
     res.cookie("token", newAccessToken, options);
     res.cookie("refreshToken", newRefreshToken, refreshOptions);
+
     return sendResponse(res, "Token refreshed successfully", 200, {
       token: newAccessToken,
     });

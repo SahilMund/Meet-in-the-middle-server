@@ -27,6 +27,14 @@ const userSchema = new mongoose.Schema(
     phone: { type: String, default: "" },
     location: { type: String, default: "" },
     bio: { type: String, default: "" },
+    authProvider: {
+      type: String,
+      enum: ["google", "facebook", "local"],
+      default: "local",
+    },
+    // For Google Calendar
+    googleAccessToken: String,
+    googleRefreshToken: String,
   },
   { timestamps: true }
 );

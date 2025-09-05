@@ -11,6 +11,7 @@ import {
   sendEmail,
   sendMeetingInvitationMail,
 } from "../utils/sendMail.util.js";
+import { createGoogleCalendarEvent } from "./google-calendar.controller.js";
 
 // conflict controller is pending
 
@@ -28,17 +29,19 @@ export const createMeeting = async (req, res) => {
     if (!title || !scheduledAt) {
       return sendResponse(res, "Title and scheduled time are required");
     }
-    const { lat, lng, placeName } = creatorLocation;
+
+    const { lat, lng, placeName } = creatorLocation || {};
     const creatorId = req.user?.id;
     const creatorEmail = req.user?.email;
-    const user = await User.findById(creatorId);
-    const hostName = user?.name;
 
+    const user = await User.findById(creatorId);
     if (!user) {
       return sendResponse(res, "Unauthorized", 401);
     }
 
-    //Create meeting data
+    const hostName = user?.name;
+
+    // 1. Create meeting document
     const meeting = new Meeting({
       title,
       description,
@@ -47,21 +50,19 @@ export const createMeeting = async (req, res) => {
       endsAt,
     });
 
-    // Generating meeting link
+    // 2. Generate meeting link
     meeting.meetingLink = `${process.env.FRONTEND_URL}/meeting/${meeting._id}`;
     await meeting.save();
 
-    const allParticipants = await Promise.all([
-      ...participants
+    // 3. Prepare participants
+    const allParticipants = await Promise.all(
+      participants
         .filter((p) => p.email !== creatorEmail)
         .map(async (p) => {
           let userId = null;
-
           if (p.email) {
             const existingUser = await User.findOne({ email: p.email });
-            if (existingUser) {
-              userId = existingUser._id;
-            }
+            if (existingUser) userId = existingUser._id;
           }
 
           return {
@@ -71,9 +72,10 @@ export const createMeeting = async (req, res) => {
             status: "Pending",
             meeting: meeting._id,
           };
-        }),
-    ]);
-    //add meeying creator in paticipants
+        })
+    );
+
+    // Add creator as participant
     allParticipants.push({
       user: creatorId,
       name: user.name,
@@ -87,6 +89,7 @@ export const createMeeting = async (req, res) => {
     meeting.participants = createdParticipants.map((p) => p._id);
     const updatedMeeting = await meeting.save();
 
+    // 4. Send email invitations
     const html = sendInvitationEmailHtml({
       title,
       description,
@@ -100,11 +103,20 @@ export const createMeeting = async (req, res) => {
       cc: participants,
       subject: `Meeting Invitation from ${hostName}`,
       html,
-    })
-      .then()
-      .catch((error) => {
-        console.error("Error sending meeting invitation:", error);
-      });
+    }).catch((error) => {
+      console.error("Error sending meeting invitation:", error);
+    });
+
+    // 5. Google Calendar integration (only if user has Google tokens)
+    createGoogleCalendarEvent({
+      userId: creatorId,
+      title,
+      description,
+      scheduledAt,
+      endsAt,
+      creatorEmail,
+      participants,
+    });
 
     return sendResponse(res, "Meeting created successfully", 201, {
       meeting: updatedMeeting,
