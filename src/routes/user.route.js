@@ -14,6 +14,8 @@ import {
   updateUserSettings,
   deleteUser,
   refreshAccessToken,
+  sendMagicLink,
+  verifyMagicLink,
 } from "../controllers/user.controller.js";
 
 import { oauthCallback } from "../controllers/oauth.controller.js";
@@ -226,7 +228,27 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", { session: false }),
-  oauthCallback
+  (req, res) => {
+    const token = jwt.sign(
+      {
+        email: req.user.email,
+        name: req.user.name,
+      },
+      process.env.SECRET_KEY,
+      { expiresIn: "7d" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // only HTTPS in prod
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    // Redirect frontend, let it fetch /currUserInfo with the cookie
+    res.redirect(process.env.FRONTEND_URL || "http://localhost:5173/home");
+  }
+
 );
 
 /**
@@ -252,9 +274,32 @@ router.get(
 router.get(
   "/facebook/callback",
   passport.authenticate("facebook", { session: false }),
-  oauthCallback
+
+  (req, res) => {
+    const token = jwt.sign(
+      {
+        email: req.user.email,
+        name: req.user.name,
+      },
+      process.env.SECRET_KEY,
+      { expiresIn: "7d" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false, // only HTTPS in prod
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    // Redirect frontend, let it fetch /currUserInfo with the cookie
+    res.redirect("http://localhost:5173/home");
+  }
+
 );
 
 router.post("/refreshAccessToken", refreshAccessToken);
+router.post("/sendMagicLink", sendMagicLink);
+router.get("/verifyMagicLink", verifyMagicLink);
 
 export default router;

@@ -27,6 +27,12 @@ const userSchema = new mongoose.Schema(
     phone: { type: String, default: "" },
     location: { type: String, default: "" },
     bio: { type: String, default: "" },
+    lastLoginDevice: {
+      browser: { type: String },
+      os: { type: String },
+      device: { type: String },
+      ip: { type: String },
+    },
   },
   { timestamps: true }
 );
