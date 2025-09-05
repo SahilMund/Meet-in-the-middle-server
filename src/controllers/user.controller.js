@@ -48,7 +48,7 @@ export const login = async (req, res) => {
   const { email, password, rememberMe } = req.body;
   try {
     const user = await User.findOne({ email });
-
+    console.log("the user", user);
     if (!user || !(await user.comparePassword(password))) {
       return sendResponse(res, "Invalid credentials", 401);
     }
@@ -67,7 +67,10 @@ export const login = async (req, res) => {
     const deviceInfo = getDeviceInfo(req);
     if (
       !user.lastLoginDevice ||
-      user.lastLoginDevice.device !== deviceInfo.device
+      user.lastLoginDevice.device !== deviceInfo.device ||
+      user.lastLoginDevice.os !== deviceInfo.os ||
+      user.lastLoginDevice.browser !== deviceInfo.browser ||
+      user.lastLoginDevice.ip !== deviceInfo.ip
     ) {
       await sendMagicEmail(
         user.email,
