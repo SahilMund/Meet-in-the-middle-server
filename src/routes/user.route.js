@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import express from "express";
-import jwt from "jsonwebtoken";
 import passport from "passport";
 
 import { upload } from "../configs/multer.js";
@@ -18,6 +17,8 @@ import {
   sendMagicLink,
   verifyMagicLink,
 } from "../controllers/user.controller.js";
+
+import { oauthCallback } from "../controllers/oauth.controller.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
 
 dotenv.config({ quiet: true });
@@ -247,6 +248,7 @@ router.get(
     // Redirect frontend, let it fetch /currUserInfo with the cookie
     res.redirect(process.env.FRONTEND_URL || "http://localhost:5173/home");
   }
+
 );
 
 /**
@@ -268,9 +270,11 @@ router.get(
  *     summary: Facebook callback
  *     description: Handles Facebook authentication callback and returns JWT.
  */
+
 router.get(
   "/facebook/callback",
   passport.authenticate("facebook", { session: false }),
+
   (req, res) => {
     const token = jwt.sign(
       {
@@ -291,6 +295,7 @@ router.get(
     // Redirect frontend, let it fetch /currUserInfo with the cookie
     res.redirect("http://localhost:5173/home");
   }
+
 );
 
 router.post("/refreshAccessToken", refreshAccessToken);
