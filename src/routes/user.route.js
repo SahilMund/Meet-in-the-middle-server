@@ -15,6 +15,8 @@ import {
   updateUserSettings,
   deleteUser,
   refreshAccessToken,
+  sendMagicLink,
+  verifyMagicLink,
 } from "../controllers/user.controller.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
 
@@ -235,7 +237,6 @@ router.get(
       { expiresIn: "7d" }
     );
 
-
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // only HTTPS in prod
@@ -243,8 +244,7 @@ router.get(
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-
- // Redirect frontend, let it fetch /currUserInfo with the cookie
+    // Redirect frontend, let it fetch /currUserInfo with the cookie
     res.redirect(process.env.FRONTEND_URL || "http://localhost:5173/home");
   }
 );
@@ -288,12 +288,13 @@ router.get(
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-
- // Redirect frontend, let it fetch /currUserInfo with the cookie
+    // Redirect frontend, let it fetch /currUserInfo with the cookie
     res.redirect("http://localhost:5173/home");
   }
 );
 
 router.post("/refreshAccessToken", refreshAccessToken);
+router.post("/sendMagicLink", sendMagicLink);
+router.get("/verifyMagicLink", verifyMagicLink);
 
 export default router;
