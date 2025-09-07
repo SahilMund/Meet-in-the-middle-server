@@ -35,6 +35,12 @@ const userSchema = new mongoose.Schema(
     // For Google Calendar
     googleAccessToken: String,
     googleRefreshToken: String,
+    lastLoginDevice: {
+      browser: { type: String },
+      os: { type: String },
+      device: { type: String },
+      ip: { type: String },
+    },
   },
   { timestamps: true }
 );

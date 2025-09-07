@@ -16,8 +16,12 @@ import sendResponse from "../utils/response.util.js";
 import {
   sendDeleteConformationMail,
   sendPermanentDeletionMail,
+  sendMagicEmail,
 } from "../utils/sendMail.util.js";
 import { toMs } from "../utils/msConverter.util.js";
+import { magicLinkMail } from "../utils/nodemailerHtml.js";
+import { getDeviceInfo } from "../utils/deviceInfo.js";
+import newDeviceLoginTemplate from "../emailTemplates/newDeviceLoginTemplete.js";
 
 export const getUserInfo = async (req, res) => {
   // Assuming req.user is set by the isLoggedIn middleware
@@ -46,7 +50,7 @@ export const login = async (req, res) => {
   const { email, password, rememberMe } = req.body;
   try {
     const user = await User.findOne({ email });
-
+    console.log("the user", user);
     if (!user || !(await user.comparePassword(password))) {
       return sendResponse(res, "Invalid credentials", 401);
     }
@@ -62,7 +66,22 @@ export const login = async (req, res) => {
         { new: true }
       )
       .then((e) => console.log(e));
-
+    const deviceInfo = getDeviceInfo(req);
+    if (
+      !user.lastLoginDevice ||
+      user.lastLoginDevice.device !== deviceInfo.device ||
+      user.lastLoginDevice.os !== deviceInfo.os ||
+      user.lastLoginDevice.browser !== deviceInfo.browser ||
+      user.lastLoginDevice.ip !== deviceInfo.ip
+    ) {
+      await sendMagicEmail(
+        user.email,
+        "New Device Login Alert",
+        newDeviceLoginTemplate(deviceInfo,user.name)
+      );
+    }
+    user.lastLoginDevice = deviceInfo;
+    await user.save();
     const token = jwt.sign(
       {
         id: user._id,
@@ -87,6 +106,7 @@ export const login = async (req, res) => {
     res.cookie("token", token, options);
     const refreshOptions = {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
       maxAge: toMs("30d"),
     };
     res.cookie("refreshToken", refreshToken, refreshOptions);
@@ -339,7 +359,7 @@ export const deleteUser = async (req, res) => {
 export const refreshAccessToken = async (req, res) => {
   const { refreshToken } = req.cookies;
   if (!refreshToken) {
-    return sendResponse(res, "No refresh token provided", 401);
+    return sendResponse(res, "No refresh token provided", 404);
   }
 
   try {
@@ -383,6 +403,77 @@ export const refreshAccessToken = async (req, res) => {
       token: newAccessToken,
     });
   } catch (error) {
-    return sendResponse(res, error.message, 403);
+    return sendResponse(res, error.message, 500);
+  }
+};
+
+export const sendMagicLink = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return sendResponse(res, "user not found", 404);
+    }
+
+    const magicToken = jwt.sign(
+      { email: user.email, id: user._id },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "10m" }
+    );
+
+    const magicLink = `${process.env.BACKEND_URL}/user/verifyMagicLink?token=${magicToken}`;
+    await sendMagicEmail(
+      user.email,
+      "Your Magic Login Link",
+      magicLinkMail(magicLink)
+    );
+    return sendResponse(res, "Magic Link sent to email successfully", 200);
+  } catch (error) {
+    return sendResponse(res, error.message, 500);
+  }
+};
+
+export const verifyMagicLink = async (req, res) => {
+  try {
+    const { token } = req.query;
+    if (!token) {
+      return sendResponse(res, "Token missing", 400);
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const { id, email } = decoded;
+    const loginToken = jwt.sign({ id, email }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "7d",
+    });
+    const deviceInfo = getDeviceInfo(req);
+    const user = await User.findById(id);
+    if (
+      !user.lastLoginDevice ||
+      user.lastLoginDevice.device !== deviceInfo.device
+    ) {
+      await sendMagicEmail(
+        user.email,
+        "New Device Login Alert",
+        `<p>Hello ${user.name},</p>
+     <p>A login was detected from a new device:</p>
+     <ul>
+       <li><b>Device:</b> ${deviceInfo.device}</li>
+       <li><b>Browser:</b> ${deviceInfo.browser}</li>
+       <li><b>OS:</b> ${deviceInfo.os}</li>
+       <li><b>IP:</b> ${deviceInfo.ip}</li>
+     </ul>
+     <p>If this wasn’t you, please reset your password immediately.</p>`
+      );
+    }
+    user.lastLoginDevice = deviceInfo;
+    await user.save();
+    res.cookie("token", loginToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    return res.redirect(`${process.env.FRONTEND_URL}/home`);
+  } catch (error) {
+    return sendResponse(res, error.message, 500);
   }
 };
