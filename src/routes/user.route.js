@@ -215,7 +215,15 @@ router.put("/deleteUser", isLoggedIn, deleteUser);
  */
 router.get(
   "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+  passport.authenticate("google", {
+    scope: [
+      "profile",
+      "email",
+      "https://www.googleapis.com/auth/calendar.events",
+    ],
+    accessType: "offline", // 👈 tells Google to send refresh_token
+    prompt: "consent", // 👈 force consent screen every time
+  })
 );
 
 /**
