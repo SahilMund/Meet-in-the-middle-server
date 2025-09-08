@@ -36,6 +36,18 @@ const participantSchema = new Schema(
   { timestamps: true }
 );
 
+participantSchema.index({ email: 1 });
+// 👉 Used in: Invitation sending/checking if user already invited by email.
+
+participantSchema.index({ meeting: 1 });
+// 👉 Used in: Fetch all participants of a meeting (when showing participants list).
+
+participantSchema.index({ meeting: 1, status: 1 });
+// 👉 Used in: RSVP queries → e.g., "Show all Accepted participants" for notifications/reminders.
+
+participantSchema.index({ email: 1, meeting: 1 }, { unique: true });
+// 👉 Used in: Invitation creation → prevents duplicate invites for the same meeting + email.
+
 const Participant = mongoose.model("Participant", participantSchema);
 
 export default Participant;

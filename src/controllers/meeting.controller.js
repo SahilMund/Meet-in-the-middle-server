@@ -11,10 +11,8 @@ import {
   sendEmail,
   sendMeetingInvitationMail,
 } from "../utils/sendMail.util.js";
-import { createGoogleCalendarEvent } from "./google-calendar.controller.js";
+import { createGoogleCalendarEvent } from "../services/google-calendar.service.js";
 import { sendPushToSubscribers } from "../controllers/notifications.controller.js";
-
-// conflict controller is pending
 
 export const createMeeting = async (req, res) => {
   try {
@@ -86,9 +84,23 @@ export const createMeeting = async (req, res) => {
       meeting: meeting._id,
     });
 
-    const createdParticipants = await Participant.insertMany(allParticipants);
-    meeting.participants = createdParticipants.map((p) => p._id);
-    const updatedMeeting = await meeting.save();
+    // const createdParticipants = await Participant.insertMany(allParticipants);
+    // meeting.participants = createdParticipants.map((p) => p._id);
+    // const updatedMeeting = await meeting.save();
+
+    const createdParticipants = await Participant.insertMany(allParticipants, {
+      ordered: false,
+    });
+
+    //avoids multiple round-trips, if we ignore save()
+    await Meeting.updateOne(
+      { _id: meeting._id },
+      {
+        $push: {
+          participants: { $each: createdParticipants.map((p) => p._id) },
+        },
+      }
+    );
 
     // 4. Send email invitations
     const html = sendInvitationEmailHtml({
