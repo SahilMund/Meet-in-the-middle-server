@@ -33,7 +33,7 @@ export const getUserInfo = async (req, res) => {
   // Use .lean() when not modifying data → improves performance.
   // Combine queries with Promise.all to avoid sequential DB calls.
 
-  // const { email, id } = req.user;
+  const { email, id } = req.user;
   // const user = await User.findOne({ email });
   // const Preferences = await Preferences.findOne({ userId: id });
 
@@ -606,7 +606,7 @@ export const sendMagicLink = async (req, res) => {
 
     // Construct magic link with proper URL encoding
     const magicLink = new URL(
-      `${process.env.BACKEND_URL}/auth/verify-magic-link`
+      `${process.env.BACKEND_URL}/user/verifyMagicLink`
     );
     magicLink.searchParams.append("token", magicToken);
 

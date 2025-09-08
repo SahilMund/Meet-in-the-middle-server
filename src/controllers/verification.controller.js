@@ -81,16 +81,25 @@ const verifyOTP = async (req, res) => {
     // 5. Delete OTP after verification
     await OtpModel.deleteOne({ email });
 
-    await sendWelComeMail(email);
     const userSettingsNew = await Preferences.create({
       userId: user._id,
     });
 
     //creating user default settings
-    user.settings = userSettingsNew._id;
-    user.save().then();
+    // user.settings = userSettingsNew._id;
+    // user.save().then();
+
+    //avoid .save() here. Use findByIdAndUpdate since you don’t need schema hooks/middleware for this simple field assignment.
+    await UserModel.findByIdAndUpdate(user._id, {
+      settings: userSettingsNew._id,
+    });
+
+    // 7. Send welcome mail (async but not blocking response)
+    sendWelComeMail(email).catch((err) =>
+      console.error("Failed to send welcome email:", err)
+    );
+
     res.status(200).json({ message: "OTP verified successfully" });
-    // res.status(200).json(Preferences);
   } catch (error) {
     console.error("Error verifying OTP:", error);
     res.status(500).json({ message: "Failed to verify OTP", error });
