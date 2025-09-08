@@ -1,6 +1,8 @@
+import crypto from "crypto";
+
 import OtpModel from "../models/otp.model.js";
 import UserModel from "../models/user.model.js";
-import userSettings from "../models/userSettings.mode.js";
+import Preferences from "../models/preferences.model.js";
 import {
   sendWelComeMail,
   sendVerificationEmail,
@@ -9,21 +11,33 @@ import {
 const sendOTP = async (req, res) => {
   try {
     const email = req.body.email; // Assuming the user's email is stored in req.email
-    const otp = Math.floor(100000 + Math.random() * 900000); // Generate a random 6-digit OTP
+    // const otp = Math.floor(100000 + Math.random() * 900000); // Generate a random 6-digit OTP
 
-    const exists = await OtpModel.findOne({ email });
-    if (exists) {
-      exists.createdAt = new Date();
-      exists.otp = otp;
-      await exists.save();
-    } else {
-      const otpData = new OtpModel({
-        email,
-        otp,
-      });
-      await otpData.save();
-      console.log(otpData);
-    }
+    // Uses Math.random() → not cryptographically secure.
+    // Predictable if someone brute-forces fast enough.
+
+    const otp = crypto.randomInt(100000, 999999).toString();
+
+    // const exists = await OtpModel.findOne({ email });
+    // if (exists) {
+    //   exists.createdAt = new Date();
+    //   exists.otp = otp;
+    //   await exists.save();
+    // } else {
+    //   const otpData = new OtpModel({
+    //     email,
+    //     otp,
+    //   });
+    //   await otpData.save();
+    //   console.log(otpData);
+    // }
+
+    // Atomic upsert -- update+insert
+    await OtpModel.findOneAndUpdate(
+      { email }, // search by email
+      { $set: { otp, createdAt: new Date() } }, // update if exists
+      { upsert: true, new: true } // if not found → insert
+    );
 
     await sendVerificationEmail(email, otp);
 
@@ -68,13 +82,15 @@ const verifyOTP = async (req, res) => {
     await OtpModel.deleteOne({ email });
 
     await sendWelComeMail(email);
-    const userSettingsNew = await userSettings.create({
+    const userSettingsNew = await Preferences.create({
       userId: user._id,
-    }); //creating user default settings
+    });
+
+    //creating user default settings
     user.settings = userSettingsNew._id;
     user.save().then();
     res.status(200).json({ message: "OTP verified successfully" });
-    // res.status(200).json(userSettings);
+    // res.status(200).json(Preferences);
   } catch (error) {
     console.error("Error verifying OTP:", error);
     res.status(500).json({ message: "Failed to verify OTP", error });

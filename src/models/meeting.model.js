@@ -38,6 +38,20 @@ const meetingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Meeting schema
+meetingSchema.index({ creator: 1 });
+// 👉 Used in: "My Meetings" dashboard to fetch all meetings created by a user.
+
+meetingSchema.index({ scheduledAt: 1 });
+// 👉 Used in: Upcoming meetings reminders + calendar integrations.
+// Example: send reminders for meetings happening in the next hour.
+
+meetingSchema.index({ participants: 1 });
+// 👉 Used in: Fetch all meetings where a user is a participant (dashboard, invites list).
+
+meetingSchema.index({ scheduledAt: 1, creator: 1 });
+// 👉 Used in: Analytics/dashboard filters like "Show my meetings for next 7 days".
+
 const Meeting = mongoose.model("Meeting", meetingSchema);
 
 export default Meeting;
