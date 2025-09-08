@@ -143,7 +143,7 @@ export const createMeeting = async (req, res) => {
     sendPushToSubscribers(payload, participantEmails);
 
     return sendResponse(res, "Meeting created successfully", 201, {
-      meeting: updatedMeeting,
+      meeting: payload,
     });
   } catch (error) {
     return sendResponse(res, error.message, 500);
