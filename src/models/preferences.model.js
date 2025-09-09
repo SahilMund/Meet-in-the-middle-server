@@ -28,21 +28,21 @@ const preferencesSchema = new Schema({
     type: Boolean,
     default: true,
   },
-  weeklyDigest: {
+  inAppNotification: {
     type: Boolean,
     default: true,
   },
   locationSharing: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   activityStatus: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   searchableProfile: {
     type: Boolean,
-    default: true,
+    default: false,
   },
 });
 

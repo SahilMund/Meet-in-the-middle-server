@@ -1,5 +1,5 @@
-// controllers/googleCalendar.controller.js
 import { google } from "googleapis";
+
 import User from "../models/user.model.js";
 
 /**

@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+
 import User from "../models/user.model.js"; // adjust path as needed
 import { toMs } from "../utils/msConverter.util.js";
 

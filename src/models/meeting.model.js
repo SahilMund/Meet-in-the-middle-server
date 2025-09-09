@@ -35,7 +35,7 @@ const meetingSchema = new mongoose.Schema(
       placeName: { type: String, default: null },
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Meeting schema
