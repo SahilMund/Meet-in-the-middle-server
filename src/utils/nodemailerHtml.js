@@ -422,5 +422,30 @@ const accountDeletedMail = () => `
 </body>
 </html>
 `;
+const magicLinkMail = (magicLink) => {
+  return `<div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f7f7f7;">
+    <div style="max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+      <h2 style="color: #333; text-align: center;">🔑 Magic Login</h2>
+      <p style="color: #555; font-size: 16px;">
+        Hi there,<br/><br/>
+        Click the button below to securely log in. This link is valid for only <b>10 minutes</b>.
+      </p>
+      <div style="text-align: center; margin: 20px 0;">
+        <a href="${magicLink}" 
+           style="background-color: #4f46e5; color: white; padding: 12px 24px; 
+                  text-decoration: none; border-radius: 6px; font-size: 16px; display: inline-block;">
+          🔗 Login Now
+        </a>
+      </div>
+    </div>
+  </div>
+  `;
+};
 
-export { welCOmeMail, html, userDeleteTemplete, accountDeletedMail };
+export {
+  welCOmeMail,
+  html,
+  userDeleteTemplete,
+  accountDeletedMail,
+  magicLinkMail,
+};

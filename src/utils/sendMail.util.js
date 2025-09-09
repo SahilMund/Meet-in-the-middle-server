@@ -1,4 +1,4 @@
-import { transporter } from "../configs/nodeMailerTransporter.js";
+import { transporter } from "../configs/nodeMailer.js";
 import cron from "node-cron";
 import {
   accountDeletedMail,
@@ -133,4 +133,20 @@ export const scheduleConfirmationRemainder = async (
     }
   });
   task.start();
+};
+
+export const sendMagicEmail = async (email, subject, html) => {
+  const mailOptions = {
+    from: process.env.NODE_MAILER_MAIL,
+    to: email,
+    subject,
+    html,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    return info;
+  } catch (error) {
+    throw new Error("Failed to send email - " + error);
+  }
 };

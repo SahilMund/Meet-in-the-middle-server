@@ -18,6 +18,7 @@ module.exports = {
       "error",
       {
         singleQuote: false,
+        endOfLine: "auto",
       },
     ],
     "no-console": "off",
@@ -34,7 +35,7 @@ module.exports = {
           "index",
         ],
         alphabetize: { order: "asc", caseInsensitive: true },
-        "newlines-between": "always",
+        "newlines-between": "auto", // change to "always" later
       },
     ],
   },

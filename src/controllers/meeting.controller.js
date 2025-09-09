@@ -11,8 +11,8 @@ import {
   sendEmail,
   sendMeetingInvitationMail,
 } from "../utils/sendMail.util.js";
-
-// conflict controller is pending
+import { createGoogleCalendarEvent } from "../services/google-calendar.service.js";
+import { sendPushToSubscribers } from "../controllers/notifications.controller.js";
 
 export const createMeeting = async (req, res) => {
   try {
@@ -28,17 +28,19 @@ export const createMeeting = async (req, res) => {
     if (!title || !scheduledAt) {
       return sendResponse(res, "Title and scheduled time are required");
     }
-    const { lat, lng, placeName } = creatorLocation;
+
+    const { lat, lng, placeName } = creatorLocation || {};
     const creatorId = req.user?.id;
     const creatorEmail = req.user?.email;
-    const user = await User.findById(creatorId);
-    const hostName = user?.name;
 
+    const user = await User.findById(creatorId);
     if (!user) {
       return sendResponse(res, "Unauthorized", 401);
     }
 
-    //Create meeting data
+    const hostName = user?.name;
+
+    // 1. Create meeting document
     const meeting = new Meeting({
       title,
       description,
@@ -47,21 +49,19 @@ export const createMeeting = async (req, res) => {
       endsAt,
     });
 
-    // Generating meeting link
+    // 2. Generate meeting link
     meeting.meetingLink = `${process.env.FRONTEND_URL}/meeting/${meeting._id}`;
     await meeting.save();
 
-    const allParticipants = await Promise.all([
-      ...participants
+    // 3. Prepare participants
+    const allParticipants = await Promise.all(
+      participants
         .filter((p) => p.email !== creatorEmail)
         .map(async (p) => {
           let userId = null;
-
           if (p.email) {
             const existingUser = await User.findOne({ email: p.email });
-            if (existingUser) {
-              userId = existingUser._id;
-            }
+            if (existingUser) userId = existingUser._id;
           }
 
           return {
@@ -71,9 +71,10 @@ export const createMeeting = async (req, res) => {
             status: "Pending",
             meeting: meeting._id,
           };
-        }),
-    ]);
-    //add meeying creator in paticipants
+        })
+    );
+
+    // Add creator as participant
     allParticipants.push({
       user: creatorId,
       name: user.name,
@@ -83,10 +84,25 @@ export const createMeeting = async (req, res) => {
       meeting: meeting._id,
     });
 
-    const createdParticipants = await Participant.insertMany(allParticipants);
-    meeting.participants = createdParticipants.map((p) => p._id);
-    const updatedMeeting = await meeting.save();
+    // const createdParticipants = await Participant.insertMany(allParticipants);
+    // meeting.participants = createdParticipants.map((p) => p._id);
+    // const updatedMeeting = await meeting.save();
 
+    const createdParticipants = await Participant.insertMany(allParticipants, {
+      ordered: false,
+    });
+
+    //avoids multiple round-trips, if we ignore save()
+    await Meeting.updateOne(
+      { _id: meeting._id },
+      {
+        $push: {
+          participants: { $each: createdParticipants.map((p) => p._id) },
+        },
+      }
+    );
+
+    // 4. Send email invitations
     const html = sendInvitationEmailHtml({
       title,
       description,
@@ -100,14 +116,34 @@ export const createMeeting = async (req, res) => {
       cc: participants,
       subject: `Meeting Invitation from ${hostName}`,
       html,
-    })
-      .then()
-      .catch((error) => {
-        console.error("Error sending meeting invitation:", error);
-      });
+    }).catch((error) => {
+      console.error("Error sending meeting invitation:", error);
+    });
+
+    // 5. Google Calendar integration (only if user has Google tokens)
+    createGoogleCalendarEvent({
+      userId: creatorId,
+      title,
+      description,
+      scheduledAt,
+      endsAt,
+      creatorEmail,
+      participants,
+    });
+
+    // ✅ 6. Push notification to participants
+    const payload = {
+      title: "New Meeting Scheduled",
+      body: `Meeting "${title}" created by ${hostName}`,
+      url: meeting.meetingLink,
+    };
+
+    // Send push to all participant emails
+    const participantEmails = allParticipants.map((p) => p.email);
+    sendPushToSubscribers(payload, participantEmails);
 
     return sendResponse(res, "Meeting created successfully", 201, {
-      meeting: updatedMeeting,
+      meeting: payload,
     });
   } catch (error) {
     return sendResponse(res, error.message, 500);
@@ -277,16 +313,16 @@ export const editMeetingById = async (req, res) => {
       meetingLink: meeting.meetingLink,
     });
 
-    sendMeetingInvitationMail({
-      to: "",
-      ccc: meeting.participants,
-      subject: `Meeting Invitation from ${meeting.creator}`,
-      html,
-    })
-      .then()
-      .catch((error) => {
-        console.error("Error sending meeting invitation:", error);
-      });
+    // sendMeetingInvitationMail({
+    //   to: "",
+    //   ccc: meeting.participants,
+    //   subject: `Meeting Invitation from ${meeting.creator}`,
+    //   html,
+    // })
+    //   .then()
+    //   .catch((error) => {
+    //     console.error("Error sending meeting invitation:", error);
+    //   });
 
     sendResponse(res, "Meeting updated successfully!", 200, {
       meeting: updatedMeeting,
@@ -338,7 +374,7 @@ export const rejectMeeting = async (req, res) => {
     if (!participant) {
       return sendResponse(res, "Participant not found", 404);
     }
-    participant.status = "rejected";
+    participant.status = "Rejected";
     await participant.save();
     sendResponse(res, "Participantion updated successfully!", 200, {});
   } catch (error) {
@@ -358,7 +394,7 @@ export const conflicts = async (req, res) => {
 
     const myParticipations = await Participant.find({
       email,
-      status: { $ne: "rejected" },
+      status: { $ne: "Rejected" },
     })
       .select("meeting status")
       .populate("meeting");
