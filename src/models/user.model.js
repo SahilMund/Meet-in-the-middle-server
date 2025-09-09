@@ -27,6 +27,8 @@ const userSchema = new mongoose.Schema(
     phone: { type: String, default: "" },
     location: { type: String, default: "" },
     bio: { type: String, default: "" },
+    resetToken:{ type: String},
+    resetTokenExpire:{type:Date}
   },
   { timestamps: true }
 );

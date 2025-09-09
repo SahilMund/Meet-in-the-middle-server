@@ -48,8 +48,8 @@ const verifyCb = async (accessToken, refreshToken, profile, done) => {
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientID: process.env.GOOGLE_CLIENTID,
+      clientSecret: process.env.GOOGLE_CLIENTSECRET,
       callbackURL: process.env.GOOGLE_CALLBACK,
     },
     verifyCb
@@ -60,8 +60,8 @@ passport.use(
 passport.use(
   new FacebookStrategy(
     {
-      clientID: process.env.FACEBOOK_CLIENT_ID,
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+      clientID: process.env.FACEBOOK_CLIENTID,
+      clientSecret: process.env.FACEBOOK_CLIENTSECRET,
       callbackURL: process.env.FACEBOOK_CALLBACK,
       profileFields: ["id", "emails", "name", "displayName", "photos"],
     },

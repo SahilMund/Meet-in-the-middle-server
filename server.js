@@ -2,6 +2,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config({ quiet: true });
+import authRoutes from "./src/routes/auth.route.js";
 
 import express from "express";
 import passport from "passport";
@@ -41,6 +42,7 @@ app.use(
 
 app.use(logger);
 app.use(passport.initialize());
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is working!");
