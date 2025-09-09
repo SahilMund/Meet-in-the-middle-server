@@ -68,7 +68,7 @@ export const createMeeting = async (req, res) => {
             user: userId,
             name: p.name,
             email: p.email,
-            status: "pending",
+            status: "Pending",
             meeting: meeting._id,
           };
         }),
@@ -78,7 +78,7 @@ export const createMeeting = async (req, res) => {
       user: creatorId,
       name: user.name,
       email: creatorEmail,
-      status: "accepted",
+      status: "Accepted",
       location: { lat, lng, placeName } || {},
       meeting: meeting._id,
     });
@@ -157,7 +157,7 @@ export const getPendingMeetings = async (req, res) => {
     // Fetch participations
     const myParticipations = await Participant.find({
       email,
-      status: "pending",
+      status: "Pending",
     })
       .skip((pageNo - 1) * items)
       .limit(items)
@@ -311,7 +311,7 @@ export const acceptMeeting = async (req, res) => {
     if (!participant) {
       return sendResponse(res, "Participant not found", 404);
     }
-    participant.status = "accepted";
+    participant.status = "Accepted";
     participant.location.lat = lat;
     participant.location.lng = lng;
     participant.location.placeName = placeName;
@@ -413,7 +413,7 @@ export const dashboardStats = async (req, res) => {
     data.upcomingmeetings = upcomingmeetings.length;
 
     const pendingInvations = myParticipations.filter(
-      (p) => p.status === "pending"
+      (p) => p.status === "Pending"
     );
     data.pendingInvations = pendingInvations.length;
 
@@ -436,7 +436,7 @@ export const dashboardStats = async (req, res) => {
       }, 0);
       data.avgParticipants = totalPartcipants / myParticipations.length;
 
-      const accepted = myParticipations.filter((p) => p.status === "accepted");
+      const accepted = myParticipations.filter((p) => p.status === "Accepted");
       data.successRate = (accepted.length / myParticipations.length).toFixed(2);
     }
     return sendResponse(res, "succesfully fetch the stats", 200, data);
@@ -547,7 +547,7 @@ export const scheduleMeetingReminder = async (req, res) => {
     //filter participants
     const participants = meeting.participants.filter(
       (p) =>
-        p.status === "accepted" && p.user?.settings?.emailNotifications === true
+        p.status === "Accepted" && p.user?.settings?.emailNotifications === true
     );
     const recipientEmails = participants.map((p) => p.user.email);
     const remainder1Day = new Date(startTime.getTime() - 24 * 60 * 60 * 1000);
@@ -602,7 +602,7 @@ export const confirmationRemainder = async (req, res) => {
     //filter participants
     const participants = meeting.participants.filter(
       (p) =>
-        p.status === "pending" && p.user?.settings?.emailNotifications === true
+        p.status === "Pending" && p.user?.settings?.emailNotifications === true
     );
     await scheduleConfirmationRemainder(meeting, participants, startTime);
   } catch (error) {
@@ -620,7 +620,7 @@ export const calculateEquidistantPoint = async (req, res) => {
       return sendResponse(res, "meeting not found", 400, null);
     }
     const acceptedParticipants = meeting.participants.filter(
-      (p) => p.status === "accepted" && p.location?.lat && p.location?.lng
+      (p) => p.status === "Accepted" && p.location?.lat && p.location?.lng
     );
     if (acceptedParticipants.length < 2) {
       return sendResponse(res, "No accepted participants with location", 400);
@@ -654,7 +654,9 @@ export const acceptedParticipantsLocations = async (req, res) => {
       return sendResponse(res, "meeting not found", 400, null);
     }
     const locations = meeting.participants
-      .filter((p) => p.status === "accepted" && p.location?.lat && p.location?.lng)
+      .filter(
+        (p) => p.status === "Accepted" && p.location?.lat && p.location?.lng
+      )
       .map((p) => ({
         name: p.name,
         email: p.email,
@@ -672,14 +674,15 @@ export const nearByPlaces = async (req, res) => {
   try {
     const { meetingId } = req.params;
     const { type } = req.query;
-    const meeting = await Meeting
-      .findById(meetingId)
-      .populate("participants", "location status");
+    const meeting = await Meeting.findById(meetingId).populate(
+      "participants",
+      "location status"
+    );
     if (!meeting) {
       return sendResponse(res, "meeting not found", 400, null);
     }
     const acceptedParticipants = meeting.participants.filter(
-      (p) => p.status === "accepted" && p.location?.lat && p.location?.lng
+      (p) => p.status === "Accepted" && p.location?.lat && p.location?.lng
     );
     if (acceptedParticipants.length < 2) {
       return sendResponse(res, "No accepted participants with location", 400);
@@ -696,34 +699,39 @@ export const nearByPlaces = async (req, res) => {
       lat: totalLat / acceptedParticipants.length,
       lng: totalLng / acceptedParticipants.length,
     };
-    //save equidistant point in meeting schema 
-    const apiKey = import.meta.env.GOOGLE_PLACES_API_KEY;
+    //save equidistant point in meeting schema
+    const apiKey = process.env.GOOGLE_PLACES_API_KEY;
     if (!apiKey) {
-      return sendResponse(res, "Google Places API key not configured", 500, null);
+      return sendResponse(
+        res,
+        "Google Places API key not configured",
+        500,
+        null
+      );
     }
-    const radius = 5000;  // 5 km radius
+    const radius = 5000; // 5 km radius
     const placeType = type || "restaurant";
-    const googlePlacesUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${equidistantPoint.lat},${equidistantPoint.lng}&radius=${radius}&type=${placeType}&key=${apiKey}`; 
+    const googlePlacesUrl = `https://overpass-api.de/api/interpreter?data=[out:json];
+  node["amenity"="${placeType}"](around:${radius},${equidistantPoint.lat},${equidistantPoint.lng});
+  out;`;
+    // `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${equidistantPoint.lat},${equidistantPoint.lng}&radius=${radius}&type=${placeType}&key=${apiKey}`;
     const response = await fetch(googlePlacesUrl);
     const data = await response.json();
-    if (data.status !== "OK") {
+    console.log(response)
+    if (response.status !== "OK" ) {
       return sendResponse(res, "Error fetching nearby places", 500, null);
     }
-    const places = data.results.map((place) => ({
-      name: place.name,
-      address: place.vicinity,
-      location: place.geometry.location,
-      placeId: place.place_id,
-      rating: place.rating,
-      userRatingsTotal: place.user_ratings_total,
-      
-    }));
+    // const places = data.results.map((place) => ({
+    //   name: place.name,
+    //   address: place.vicinity,
+    //   location: place.geometry.location,
+    //   placeId: place.place_id,
+    //   rating: place.rating,
+    //   userRatingsTotal: place.user_ratings_total,
+    // }));
     //save places in meeting schema
-    return sendResponse(res, "success", 200, { places });
+    return sendResponse(res, "success", 200, { places:data });
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
-
 };
-
-
