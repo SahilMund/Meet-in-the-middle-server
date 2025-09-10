@@ -11,8 +11,8 @@ import {
   sendEmail,
   sendMeetingInvitationMail,
 } from "../utils/sendMail.util.js";
-
-// conflict controller is pending
+import { createGoogleCalendarEvent } from "../services/google-calendar.service.js";
+import { sendPushToSubscribers } from "../controllers/notifications.controller.js";
 
 export const createMeeting = async (req, res) => {
   try {
@@ -28,17 +28,19 @@ export const createMeeting = async (req, res) => {
     if (!title || !scheduledAt) {
       return sendResponse(res, "Title and scheduled time are required");
     }
-    const { lat, lng, placeName } = creatorLocation;
+
+    const { lat, lng, placeName } = creatorLocation || {};
     const creatorId = req.user?.id;
     const creatorEmail = req.user?.email;
-    const user = await User.findById(creatorId);
-    const hostName = user?.name;
 
+    const user = await User.findById(creatorId);
     if (!user) {
       return sendResponse(res, "Unauthorized", 401);
     }
 
-    //Create meeting data
+    const hostName = user?.name;
+
+    // 1. Create meeting document
     const meeting = new Meeting({
       title,
       description,
@@ -47,21 +49,19 @@ export const createMeeting = async (req, res) => {
       endsAt,
     });
 
-    // Generating meeting link
+    // 2. Generate meeting link
     meeting.meetingLink = `${process.env.FRONTEND_URL}/meeting/${meeting._id}`;
     await meeting.save();
 
-    const allParticipants = await Promise.all([
-      ...participants
+    // 3. Prepare participants
+    const allParticipants = await Promise.all(
+      participants
         .filter((p) => p.email !== creatorEmail)
         .map(async (p) => {
           let userId = null;
-
           if (p.email) {
             const existingUser = await User.findOne({ email: p.email });
-            if (existingUser) {
-              userId = existingUser._id;
-            }
+            if (existingUser) userId = existingUser._id;
           }
 
           return {
@@ -71,9 +71,10 @@ export const createMeeting = async (req, res) => {
             status: "Pending",
             meeting: meeting._id,
           };
-        }),
-    ]);
-    //add meeying creator in paticipants
+        })
+    );
+
+    // Add creator as participant
     allParticipants.push({
       user: creatorId,
       name: user.name,
@@ -83,10 +84,25 @@ export const createMeeting = async (req, res) => {
       meeting: meeting._id,
     });
 
-    const createdParticipants = await Participant.insertMany(allParticipants);
-    meeting.participants = createdParticipants.map((p) => p._id);
-    const updatedMeeting = await meeting.save();
+    // const createdParticipants = await Participant.insertMany(allParticipants);
+    // meeting.participants = createdParticipants.map((p) => p._id);
+    // const updatedMeeting = await meeting.save();
 
+    const createdParticipants = await Participant.insertMany(allParticipants, {
+      ordered: false,
+    });
+
+    //avoids multiple round-trips, if we ignore save()
+    await Meeting.updateOne(
+      { _id: meeting._id },
+      {
+        $push: {
+          participants: { $each: createdParticipants.map((p) => p._id) },
+        },
+      }
+    );
+
+    // 4. Send email invitations
     const html = sendInvitationEmailHtml({
       title,
       description,
@@ -100,14 +116,34 @@ export const createMeeting = async (req, res) => {
       cc: participants,
       subject: `Meeting Invitation from ${hostName}`,
       html,
-    })
-      .then()
-      .catch((error) => {
-        console.error("Error sending meeting invitation:", error);
-      });
+    }).catch((error) => {
+      console.error("Error sending meeting invitation:", error);
+    });
+
+    // 5. Google Calendar integration (only if user has Google tokens)
+    createGoogleCalendarEvent({
+      userId: creatorId,
+      title,
+      description,
+      scheduledAt,
+      endsAt,
+      creatorEmail,
+      participants,
+    });
+
+    // ✅ 6. Push notification to participants
+    const payload = {
+      title: "New Meeting Scheduled",
+      body: `Meeting "${title}" created by ${hostName}`,
+      url: meeting.meetingLink,
+    };
+
+    // Send push to all participant emails
+    const participantEmails = allParticipants.map((p) => p.email);
+    sendPushToSubscribers(payload, participantEmails);
 
     return sendResponse(res, "Meeting created successfully", 201, {
-      meeting: updatedMeeting,
+      meeting: payload,
     });
   } catch (error) {
     return sendResponse(res, error.message, 500);
@@ -605,6 +641,132 @@ export const confirmationRemainder = async (req, res) => {
         p.status === "Pending" && p.user?.settings?.emailNotifications === true
     );
     await scheduleConfirmationRemainder(meeting, participants, startTime);
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+export const calculateEquidistantPoint = async (req, res) => {
+  try {
+    const { meetingId } = req.params;
+    const meeting = await Meeting.findById(meetingId).populate(
+      "participants",
+      "location status"
+    );
+    if (!meeting) {
+      return sendResponse(res, "meeting not found", 400, null);
+    }
+    const acceptedParticipants = meeting.participants.filter(
+      (p) => p.status === "Accepted" && p.location?.lat && p.location?.lng
+    );
+    if (acceptedParticipants.length < 2) {
+      return sendResponse(res, "No accepted participants with location", 400);
+    }
+    const totalLat = acceptedParticipants.reduce(
+      (sum, p) => sum + p.location.lat,
+      0
+    );
+    const totalLng = acceptedParticipants.reduce(
+      (sum, p) => sum + p.location.lng,
+      0
+    );
+    const equidistantPoint = {
+      lat: totalLat / acceptedParticipants.length,
+      lng: totalLng / acceptedParticipants.length,
+    };
+    return sendResponse(res, "success", 200, { equidistantPoint });
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+
+export const acceptedParticipantsLocations = async (req, res) => {
+  try {
+    const { meetingId } = req.params;
+    const meeting = await Meeting.findById(meetingId).populate(
+      "participants",
+      "location status name email"
+    );
+    if (!meeting) {
+      return sendResponse(res, "meeting not found", 400, null);
+    }
+    const locations = meeting.participants
+      .filter(
+        (p) => p.status === "Accepted" && p.location?.lat && p.location?.lng
+      )
+      .map((p) => ({
+        name: p.name,
+        email: p.email,
+        lat: p.location.lat,
+        lng: p.location.lng,
+        placeName: p.location.placeName || "Unknown",
+      }));
+    return sendResponse(res, "success", 200, { locations });
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+
+export const nearByPlaces = async (req, res) => {
+  try {
+    const { meetingId } = req.params;
+    const { type } = req.query;
+    const meeting = await Meeting.findById(meetingId).populate(
+      "participants",
+      "location status"
+    );
+    if (!meeting) {
+      return sendResponse(res, "meeting not found", 400, null);
+    }
+    const acceptedParticipants = meeting.participants.filter(
+      (p) => p.status === "Accepted" && p.location?.lat && p.location?.lng
+    );
+    if (acceptedParticipants.length < 2) {
+      return sendResponse(res, "No accepted participants with location", 400);
+    }
+    const totalLat = acceptedParticipants.reduce(
+      (sum, p) => sum + p.location.lat,
+      0
+    );
+    const totalLng = acceptedParticipants.reduce(
+      (sum, p) => sum + p.location.lng,
+      0
+    );
+    const equidistantPoint = {
+      lat: totalLat / acceptedParticipants.length,
+      lng: totalLng / acceptedParticipants.length,
+    };
+    //save equidistant point in meeting schema
+    const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+    if (!apiKey) {
+      return sendResponse(
+        res,
+        "Google Places API key not configured",
+        500,
+        null
+      );
+    }
+    const radius = 5000; // 5 km radius
+    const placeType = type || "restaurant";
+    const googlePlacesUrl = `https://overpass-api.de/api/interpreter?data=[out:json];
+  node["amenity"="${placeType}"](around:${radius},${equidistantPoint.lat},${equidistantPoint.lng});
+  out;`;
+    // `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${equidistantPoint.lat},${equidistantPoint.lng}&radius=${radius}&type=${placeType}&key=${apiKey}`;
+    const response = await fetch(googlePlacesUrl);
+    const data = await response.json();
+    console.log(response)
+    if (response.status !== "OK" ) {
+      return sendResponse(res, "Error fetching nearby places", 500, null);
+    }
+    // const places = data.results.map((place) => ({
+    //   name: place.name,
+    //   address: place.vicinity,
+    //   location: place.geometry.location,
+    //   placeId: place.place_id,
+    //   rating: place.rating,
+    //   userRatingsTotal: place.user_ratings_total,
+    // }));
+    //save places in meeting schema
+    return sendResponse(res, "success", 200, { places:data });
   } catch (error) {
     sendResponse(res, error.message, 500);
   }

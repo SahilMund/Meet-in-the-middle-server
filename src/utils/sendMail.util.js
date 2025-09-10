@@ -135,6 +135,22 @@ export const scheduleConfirmationRemainder = async (
   task.start();
 };
 
+export const sendMagicEmail = async (email, subject, html) => {
+  const mailOptions = {
+    from: process.env.NODE_MAILER_MAIL,
+    to: email,
+    subject,
+    html,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    return info;
+  } catch (error) {
+    throw new Error("Failed to send email - " + error);
+  }
+};
+
 export const sendResetPasswordMail = async (email, resetLink) => {
   const mailOptions = {
     from: process.env.NODE_MAILER_MAIL,
