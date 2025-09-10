@@ -2,7 +2,6 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config({ quiet: true });
-import authRoutes from "./src/routes/auth.route.js";
 
 import express from "express";
 import passport from "passport";
@@ -13,7 +12,6 @@ import { swaggerUi, swaggerSpec } from "./src/configs/swagger.js";
 import connectDB from "./src/configs/mongoose.js";
 import { logger } from "./src/middlewares/logger.js";
 import routes from "./src/routes/index.js";
-import verificationRoutes from "./src/routes/verificationOTP.route.js";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -42,14 +40,13 @@ app.use(
 
 app.use(logger);
 app.use(passport.initialize());
-app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is working!");
 });
 
 app.use("/api", limiter, routes);
-app.use("/api/verification", verificationRoutes);
+
 
 app.use((req, res) => {
   res.status(404).json({
