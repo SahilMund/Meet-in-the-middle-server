@@ -39,8 +39,7 @@ app.get("/", (req, res) => {
   res.send("API is working!");
 });
 
-app.use("/api", limiter, routes);
-
+app.use("/api", routes);
 
 // ---------- 404 Handler ----------
 app.use((req, res) => {

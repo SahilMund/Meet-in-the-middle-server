@@ -10,8 +10,8 @@ const router = express.Router();
 
 router.use("/user", userRoutes);
 router.use("/meeting", meetingRoutes);
-app.use("/auth", authRoutes);
-app.use("/verification", verificationRoutes);
+router.use("/auth", authRoutes);
+router.use("/verification", verificationRoutes);
 router.use("/notifications", notificationsRoutes);
 
 export default router;
