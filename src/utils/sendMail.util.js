@@ -150,3 +150,27 @@ export const sendMagicEmail = async (email, subject, html) => {
     throw new Error("Failed to send email - " + error);
   }
 };
+
+export const sendResetPasswordMail = async (email, resetLink) => {
+  const mailOptions = {
+    from: process.env.NODE_MAILER_MAIL,
+    to: email,
+    subject: "Reset Your Password - Meet in the Middle",
+    html: `
+      <h2>Reset Password Request</h2>
+      <p>Hello,</p>
+      <p>You requested to reset your password. Please click the link below to reset your password:</p>
+      <a href="${resetLink}" target="_blank" style="display:inline-block;margin-top:10px;padding:10px 20px;background:#2563eb;color:#fff;border-radius:8px;text-decoration:none;">
+        Reset Password
+      </a>
+      <p>If you did not request this, you can ignore this email.</p>
+    `,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    return info;
+  } catch (error) {
+    throw new Error("Failed to send reset password email - " + error.message);
+  }
+};
