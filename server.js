@@ -12,7 +12,6 @@ import { logger } from "./src/middlewares/logger.js";
 import { securityMiddleware } from "./src/middlewares/security.middleware.js";
 import { performanceMiddleware } from "./src/middlewares/performance.middleware.js";
 import routes from "./src/routes/index.js";
-import verificationRoutes from "./src/routes/verificationOTP.route.js";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -40,9 +39,7 @@ app.get("/", (req, res) => {
   res.send("API is working!");
 });
 
-// ---------- Routes ----------
 app.use("/api", routes);
-app.use("/api/verification", verificationRoutes);
 
 // ---------- 404 Handler ----------
 app.use((req, res) => {
