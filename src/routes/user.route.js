@@ -20,7 +20,7 @@ import {
 
 import { oauthCallback } from "../controllers/oauth.controller.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
-
+import jwt from "jsonwebtoken";
 dotenv.config({ quiet: true });
 
 const router = express.Router();

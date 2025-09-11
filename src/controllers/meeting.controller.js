@@ -569,7 +569,7 @@ export const scheduleMeetingReminder = async (req, res) => {
           select: "settings",
           populate: {
             path: "settings",
-            select: "emailNotifications",
+            select: "meetingsReminders",
           },
         },
       })
@@ -583,7 +583,7 @@ export const scheduleMeetingReminder = async (req, res) => {
     //filter participants
     const participants = meeting.participants.filter(
       (p) =>
-        p.status === "Accepted" && p.user?.settings?.emailNotifications === true
+        p.status === "Accepted" && p.user?.settings?.meetingsReminders === true
     );
     const recipientEmails = participants.map((p) => p.user.email);
     const remainder1Day = new Date(startTime.getTime() - 24 * 60 * 60 * 1000);
@@ -624,7 +624,7 @@ export const confirmationRemainder = async (req, res) => {
           select: "settings",
           populate: {
             path: "settings",
-            select: "emailNotifications",
+            select: "meetingsReminders",
           },
         },
       })
@@ -638,10 +638,25 @@ export const confirmationRemainder = async (req, res) => {
     //filter participants
     const participants = meeting.participants.filter(
       (p) =>
-        p.status === "Pending" && p.user?.settings?.emailNotifications === true
+        p.status === "Pending" && p.user?.settings?.meetingsReminders === true
     );
     await scheduleConfirmationRemainder(meeting, participants, startTime);
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
+};
+
+export const generateReport = async () => {
+  try {
+    const userId = req.user.id;
+    if (!userId) {
+      return sendResponse(res, "unauthorised", 400, null);
+    }
+    const meetings = await Participant.find({ user: userId })
+      .populate("user", "name email")
+      .populate(
+        "meeting",
+        "title creator scheduledAt endsAt locationSuggestion"
+      );
+  } catch (error) {}
 };
