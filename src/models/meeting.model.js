@@ -41,7 +41,7 @@ const meetingSchema = new mongoose.Schema(
     ]
 
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Meeting schema

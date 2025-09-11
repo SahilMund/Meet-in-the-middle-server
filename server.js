@@ -6,12 +6,16 @@ import express from "express";
 import passport from "passport";
 import oAuth from "./src/configs/passport.js"; // initializes passport strategies
 
+import http from "http";
+
 import { swaggerUi, swaggerSpec } from "./src/configs/swagger.js";
 import connectDB from "./src/configs/mongoose.js";
 import { logger } from "./src/middlewares/logger.js";
 import { securityMiddleware } from "./src/middlewares/security.middleware.js";
 import { performanceMiddleware } from "./src/middlewares/performance.middleware.js";
 import routes from "./src/routes/index.js";
+
+import { initSocket } from "./src/configs/socket.js";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -59,9 +63,17 @@ app.use((err, req, res, next) => {
 });
 
 // ---------- Start Server ----------
+// Create HTTP server with Express app
+const server = http.createServer(app);
+
 connectDB().then(() => {
   console.log("✅ MongoDB Connected Successfully");
-  app.listen(PORT, () => {
+
+  // 🔥 Initialize socket server
+  initSocket(server);
+
+  // Start listening on same server
+  server.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
     console.log(
       `📘 Swagger docs available at http://localhost:${PORT}/api-docs`

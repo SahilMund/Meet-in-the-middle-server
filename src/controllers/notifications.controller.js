@@ -1,5 +1,6 @@
 // controllers/push.controller.js
 import webpush from "web-push";
+
 import PushSubscription from "../models/pushSubscription.model.js";
 
 if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
@@ -10,7 +11,7 @@ if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
 webpush.setVapidDetails(
   "mailto:your@email.com",
   process.env.VAPID_PUBLIC_KEY,
-  process.env.VAPID_PRIVATE_KEY
+  process.env.VAPID_PRIVATE_KEY,
 );
 
 /**
@@ -21,9 +22,7 @@ export const subscribePush = async (req, res) => {
     const subscription = req.body;
 
     if (!subscription || !subscription.endpoint) {
-      return res
-        .status(400)
-        .json({ status: "error", message: "Invalid subscription" });
+      return res.status(400).json({ status: "error", message: "Invalid subscription" });
     }
 
     // Optionally associate subscription with logged-in user
@@ -35,9 +34,7 @@ export const subscribePush = async (req, res) => {
     });
 
     if (existing) {
-      return res
-        .status(200)
-        .json({ status: "success", message: "Already subscribed" });
+      return res.status(200).json({ status: "success", message: "Already subscribed" });
     }
 
     // Save subscription in DB
@@ -47,13 +44,11 @@ export const subscribePush = async (req, res) => {
       keys: subscription.keys,
     });
 
-    return res
-      .status(201)
-      .json({
-        status: "success",
-        message: "Subscribed successfully",
-        data: newSub,
-      });
+    return res.status(201).json({
+      status: "success",
+      message: "Subscribed successfully",
+      data: newSub,
+    });
   } catch (error) {
     console.error("Push subscribe error:", error);
     return res.status(500).json({ status: "error", message: error.message });
@@ -80,29 +75,5 @@ export const sendPushToSubscribers = async (payload, recipients = []) => {
     });
   } catch (err) {
     console.error("Push service error:", err);
-  }
-};
-
-/**
- * Send a push notification to all subscriptions
- */
-export const sendPush = async (req, res) => {
-  try {
-    const { title, body, url } = req.body;
-
-    const payload = JSON.stringify({ title, body, url });
-
-    const sendPromises = subscriptions.map((sub) =>
-      webpush.sendNotification(sub, payload).catch((err) => {
-        console.error("Push notification error:", err);
-      })
-    );
-
-    await Promise.all(sendPromises);
-
-    return res.json({ status: "success", message: "Notifications sent" });
-  } catch (error) {
-    console.error("Send push error:", error);
-    return res.status(500).json({ status: "error", message: error.message });
   }
 };

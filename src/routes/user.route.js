@@ -208,12 +208,7 @@ router.get("/currUserInfo", isLoggedIn, getUserInfo);
  *         description: Internal server error
  */
 
-router.post(
-  "/uploadAvatar",
-  isLoggedIn,
-  upload.single("image"),
-  uploadToDiskStorage
-);
+router.post("/uploadAvatar", isLoggedIn, upload.single("image"), uploadToDiskStorage);
 
 /**
  * @swagger
@@ -452,14 +447,10 @@ router.put("/deleteUser", isLoggedIn, deleteUser);
 router.get(
   "/google",
   passport.authenticate("google", {
-    scope: [
-      "profile",
-      "email",
-      "https://www.googleapis.com/auth/calendar.events",
-    ],
+    scope: ["profile", "email", "https://www.googleapis.com/auth/calendar.events"],
     accessType: "offline", // 👈 tells Google to send refresh_token
     prompt: "consent", // 👈 force consent screen every time
-  })
+  }),
 );
 
 /**
@@ -469,30 +460,7 @@ router.get(
  *     summary: Google callback
  *     description: Handles Google authentication callback and returns JWT.
  */
-router.get(
-  "/google/callback",
-  passport.authenticate("google", { session: false }),
-  (req, res) => {
-    const token = jwt.sign(
-      {
-        email: req.user.email,
-        name: req.user.name,
-      },
-      process.env.SECRET_KEY,
-      { expiresIn: "7d" }
-    );
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // only HTTPS in prod
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
-
-    // Redirect frontend, let it fetch /currUserInfo with the cookie
-    res.redirect(process.env.FRONTEND_URL || "http://localhost:5173/home");
-  }
-);
+router.get("/google/callback", passport.authenticate("google", { session: false }), oauthCallback);
 
 /**
  * @swagger
@@ -503,7 +471,7 @@ router.get(
  */
 router.get(
   "/facebook",
-  passport.authenticate("facebook", { scope: ["email"] }) // request email explicitly
+  passport.authenticate("facebook", { scope: ["email"] }), // request email explicitly
 );
 
 /**
@@ -517,27 +485,7 @@ router.get(
 router.get(
   "/facebook/callback",
   passport.authenticate("facebook", { session: false }),
-
-  (req, res) => {
-    const token = jwt.sign(
-      {
-        email: req.user.email,
-        name: req.user.name,
-      },
-      process.env.SECRET_KEY,
-      { expiresIn: "7d" }
-    );
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false, // only HTTPS in prod
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
-
-    // Redirect frontend, let it fetch /currUserInfo with the cookie
-    res.redirect("http://localhost:5173/home");
-  }
+  oauthCallback,
 );
 
 /**

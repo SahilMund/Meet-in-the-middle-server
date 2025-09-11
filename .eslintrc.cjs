@@ -14,6 +14,7 @@ module.exports = {
     sourceType: "module",
   },
   rules: {
+      "no-undef": "error",          // 🚨 undefined variables
     "prettier/prettier": [
       "error",
       {
@@ -35,7 +36,7 @@ module.exports = {
           "index",
         ],
         alphabetize: { order: "asc", caseInsensitive: true },
-        "newlines-between": "auto", // change to "always" later
+        "newlines-between": "always", // ✅ enforce newlines between groups
       },
     ],
   },

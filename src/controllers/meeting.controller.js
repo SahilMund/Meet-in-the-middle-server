@@ -13,6 +13,7 @@ import {
 } from "../utils/sendMail.util.js";
 import { createGoogleCalendarEvent } from "../services/google-calendar.service.js";
 import { sendPushToSubscribers } from "../controllers/notifications.controller.js";
+import { createAndSendNotification } from "../services/notify.service.js";
 
 export const createMeeting = async (req, res) => {
   try {
@@ -100,7 +101,8 @@ export const createMeeting = async (req, res) => {
           participants: { $each: createdParticipants.map((p) => p._id) },
         },
       }
-    );
+    );  
+
 
     // 4. Send email invitations
     const html = sendInvitationEmailHtml({
@@ -249,12 +251,23 @@ export const deleteMeeting = async (req, res) => {
     await Meeting.findByIdAndDelete(meetingId);
     await Participant.deleteMany({ _id: { $in: meeting.participants } });
 
+    // 🔔 Notify all participants
+    for (const p of meeting.participants) {
+      await createAndSendNotification(
+        p,
+        "MEETING_DELETED",
+        `Meeting "${meeting.title}" was cancelled by ${meeting.creator}`,
+        { meetingId }
+      );
+    }
+
     const html = sendCancellationEmailHtml({
       title: meeting.title,
       description: meeting.description,
       hostName: meeting.creator,
       scheduledAt: new Date(meeting.scheduledAt).toLocaleString(),
     });
+
     sendMeetingInvitationMail({
       to: req.user?.email,
       cc: meeting.participants,
@@ -332,6 +345,7 @@ export const editMeetingById = async (req, res) => {
   }
 };
 
+// This can be moved to invitations
 export const acceptMeeting = async (req, res) => {
   try {
     const { meetingId, lat, lng, placeName } = req.body;
@@ -353,12 +367,24 @@ export const acceptMeeting = async (req, res) => {
     participant.location.placeName = placeName;
 
     await participant.save();
+
+    // 🔔 Notify creator
+    if (participant.meeting.creator) {
+      await createAndSendNotification(
+        participant.meeting.creator,
+        "MEETING_ACCEPTED",
+        `${participant.name} accepted your meeting "${participant.meeting.title}"`,
+        { meetingId: meetingId }
+      );
+    }
+
     sendResponse(res, "Participantion updated successfully!", 200, {});
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
 };
 
+// This can be moved to invitations
 export const rejectMeeting = async (req, res) => {
   try {
     const { meetingId } = req.body;
@@ -376,6 +402,17 @@ export const rejectMeeting = async (req, res) => {
     }
     participant.status = "Rejected";
     await participant.save();
+
+    // 🔔 Notify creator
+    if (participant.meeting.creator) {
+      await createAndSendNotification(
+        participant.meeting.creator,
+        "MEETING_REJECTED",
+        `${participant.name} rejected your meeting "${participant.meeting.title}"`,
+        { meetingId }
+      );
+    }
+
     sendResponse(res, "Participantion updated successfully!", 200, {});
   } catch (error) {
     sendResponse(res, error.message, 500);
@@ -525,6 +562,7 @@ export const recentActivity = async (req, res) => {
       .populate("creator", "name email")
       .sort({ createdAt: -1 })
       .limit(parseInt(limit));
+
     const meetingActivities = recentMeetings.map((meeting) => ({
       type: "meetingCreated",
       user: meeting.creator,
