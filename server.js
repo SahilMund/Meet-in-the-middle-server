@@ -1,6 +1,13 @@
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+import webhookRoutes from "./src/routes/webhook.route.js"; // 👈 new
+
 dotenv.config({ quiet: true });
+
+// app.js or server.js
+import eventBus from "./src/events/eventBus.js";
+import registerMeetingListeners from "./src/events/MeetingListeners.js";
+
 
 import express from "express";
 import passport from "passport";
@@ -20,9 +27,12 @@ import { initSocket } from "./src/configs/socket.js";
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+app.use("/api/stripe", webhookRoutes);
+
 // ---------- Core Middlewares ----------
 app.use(cookieParser());
-app.use(express.json({ limit: "10kb" })); // limit payload size
+// app.use(express.json({ limit: "100kb" })); // limit payload size
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ---------- API Docs ----------
@@ -34,6 +44,10 @@ app.use(performanceMiddleware);
 
 // ---------- Custom Logger ----------
 app.use(logger);
+
+// ---------- event listeners ----------
+
+registerMeetingListeners(eventBus);
 
 // ---------- Passport ----------
 app.use(passport.initialize());
