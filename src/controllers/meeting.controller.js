@@ -2,10 +2,10 @@ import moment from "moment";
 import schedule from "node-schedule";
 import sendCancellationEmailHtml from "../emailTemplates/meetingCancellation.js";
 import sendInvitationEmailHtml from "../emailTemplates/meetingInvitation.js";
-import SuggestedLocation from "../models/suggestedLocationModel.js"; 
 import Meeting from "../models/meeting.model.js";
 import Participant from "../models/participant.model.js";
 import User from "../models/user.model.js";
+import testData from "./testdata.js"
 import sendResponse from "../utils/response.util.js";
 import {
   scheduleConfirmationRemainder,
@@ -783,33 +783,35 @@ export const nearByPlaces = async (req, res) => {
         500,
         null
       );
-    }
+    } 
     const radius = 5000; // 5 km radius
-    const placeType = type || "restaurant";
-    const googlePlacesUrl = `https://overpass-api.de/api/interpreter?data=[out:json];
-  node["amenity"="${placeType}"](around:${radius},${equidistantPoint.lat},${equidistantPoint.lng});
-  out;`;
-    // `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${equidistantPoint.lat},${equidistantPoint.lng}&radius=${radius}&type=${placeType}&key=${apiKey}`;
-    const response = await fetch(googlePlacesUrl);
-    const data = await response.json();
-    console.log(response);
-    if (response.status !== "OK") {
-      return sendResponse(res, "Error fetching nearby places", 500, null);
+    const placeType = type.filter(Boolean).join('|') ;
+    const googlePlacesUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${equidistantPoint.lat},${equidistantPoint.lng}&radius=${radius}&keyword=${placeType}&key=${apiKey}`;
+    // const googlePlacesUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${equidistantPoint.lat},${equidistantPoint.lng}&radius=${radius}&type=${placeType}&key=${apiKey}`;
+    //`https://overpass-api.de/api/interpreter?data=[out:json];node["amenity"="${placeType}"](around:${radius},${equidistantPoint.lat},${equidistantPoint.lng});out;`;
+    // const response = await fetch(googlePlacesUrl);
+    // const data = await response.json();
+    const data = testData;
+
+    if (data.status !== "OK") {
+      return sendResponse(res, "Error fetching nearby placess", 500, null);
     }
-    // const places = data.results.map((place) => ({
-    //   name: place.name,
-    //   address: place.vicinity,
-    //   location: place.geometry.location,
-    //   placeId: place.place_id,
-    //   rating: place.rating,
-    //   userRatingsTotal: place.user_ratings_total,
-    // }));
+    const places = data.results.map((place) => ({
+      name: place.name,
+      address: place.vicinity,
+      location: place.geometry.location,
+      placeId: place.place_id,
+      rating: place.rating,
+      photos:place.photos,
+      userRatingsTotal: place.user_ratings_total,
+    }));
     //save places in meeting schema
-    return sendResponse(res, "success", 200, { places: data });
+    return sendResponse(res, "success", 200, { places });
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
 };
+
 export const suggestedPlaces = async (req, res) => {
   try {
     const { meetingId } = req.params;
