@@ -2,6 +2,7 @@ import moment from "moment";
 import schedule from "node-schedule";
 import sendCancellationEmailHtml from "../emailTemplates/meetingCancellation.js";
 import sendInvitationEmailHtml from "../emailTemplates/meetingInvitation.js";
+import SuggestedLocation from "../models/suggestedLocationModel.js"; 
 import Meeting from "../models/meeting.model.js";
 import Participant from "../models/participant.model.js";
 import User from "../models/user.model.js";
@@ -805,6 +806,72 @@ export const nearByPlaces = async (req, res) => {
     // }));
     //save places in meeting schema
     return sendResponse(res, "success", 200, { places: data });
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+export const suggestedPlaces = async (req, res) => {
+  try {
+    const { meetingId } = req.params;
+    const meeting = await Meeting.findById(meetingId)
+      .populate("suggestedLocations") // ✅ correct populate
+      .select("suggestedLocations");  // ✅ correct field
+    if (!meeting) {
+      return sendResponse(res, "meeting not found", 400, null);
+    }
+     const suggestedPlaces =meeting.suggestedLocations;
+    return sendResponse(res, "success", 200, { suggestedPlaces });
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+
+export const finalizedLocation = async (req, res) => {
+  try {
+    const { meetingId } = req.params;
+    const meeting = await Meeting.findById(meetingId)
+      .populate("suggestedLocations") // ✅ correct populate
+      .select("suggestedLocations");  // ✅ correct field
+    if (!meeting) {
+      return sendResponse(res, "meeting not found", 400, null);
+    }
+
+     const suggestedPlaces =meeting.suggestedLocations;
+if(suggestedPlaces.length===0) return sendResponse(res, "No Suggested Places", 202);
+     const highestVotedPlace = suggestedPlaces.reduce((acc,ele)=>{
+      return acc.voteCount>=ele.voteCount?acc:ele;
+     })
+  const suggestedLocationIsUpdated=    await SuggestedLocation.findByIdAndUpdate(highestVotedPlace._id,{isFinalized:true},{new:true})
+    return sendResponse(res, "success", 200, { suggestedLocationIsUpdated });
+
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+export const toggleLike = async (req, res) => {
+  try {
+    const { suggestedPlacesId } = req.params;
+    const currentLocation = await SuggestedLocation.findById(suggestedPlacesId)
+    
+    if (!currentLocation) {
+      return sendResponse(res, "Suggested Location not found", 400, null);
+    }
+    if(currentLocation.voters.includes(req.user.id)) {
+      await SuggestedLocation.findByIdAndUpdate(
+  suggestedPlacesId,
+  {
+    $pull: { voters: req.user.id },  // remove user from voters array
+    $inc: { voteCount: -1 },         // decrement voteCount by 1
+  },
+  { new: true } // optional: returns updated doc
+);
+
+    }
+     else {
+    await SuggestedLocation.findByIdAndUpdate(suggestedPlacesId,{$push:{voters:req.user.id}, $inc: { voteCount:1 }, })
+     }
+    return sendResponse(res, "Like Updated Successfully", 200 );
+
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
