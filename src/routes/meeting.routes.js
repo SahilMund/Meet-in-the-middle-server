@@ -19,9 +19,11 @@ import {
   nearByPlaces
 } from "../controllers/meeting.controller.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
+import { enforcePlanLimits } from "../middlewares/payment.middleware.js";
 const router = express.Router();
 
-router.post("/createMeeting", isLoggedIn, createMeeting);
+router.post("/createMeeting", isLoggedIn, enforcePlanLimits, createMeeting);
+
 router.get("/getMeetings", isLoggedIn, getMeetings);
 router.get("/getPendingMeetings", isLoggedIn, getPendingMeetings);
 router.get("/getMeetingById/:meetingId", isLoggedIn, getMeetingById);

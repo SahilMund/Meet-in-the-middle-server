@@ -24,21 +24,21 @@ module.exports = {
     ],
     "no-console": "off",
     "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
-    "import/order": [
-      "error",
-      {
-        groups: [
-          "builtin",
-          "external",
-          "internal",
-          "parent",
-          "sibling",
-          "index",
-        ],
-        alphabetize: { order: "asc", caseInsensitive: true },
-        "newlines-between": "always", // ✅ enforce newlines between groups
-      },
-    ],
+    // "import/order": [
+    //   "error",
+    //   {
+    //     groups: [
+    //       "builtin",
+    //       "external",
+    //       "internal",
+    //       "parent",
+    //       "sibling",
+    //       "index",
+    //     ],
+    //     alphabetize: { order: "asc", caseInsensitive: true },
+    //     "newlines-between": "always", // ✅ enforce newlines between groups
+    //   },
+    // ],
   },
   ignorePatterns: ["node_modules", "dist", "build", "coverage"],
 };

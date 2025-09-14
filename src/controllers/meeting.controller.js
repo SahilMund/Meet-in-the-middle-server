@@ -1,5 +1,9 @@
 import moment from "moment";
+import mongoose from "mongoose";
 import schedule from "node-schedule";
+
+import Joi from "joi";
+
 import sendCancellationEmailHtml from "../emailTemplates/meetingCancellation.js";
 import sendInvitationEmailHtml from "../emailTemplates/meetingInvitation.js";
 import Meeting from "../models/meeting.model.js";
@@ -11,37 +15,72 @@ import {
   sendEmail,
   sendMeetingInvitationMail,
 } from "../utils/sendMail.util.js";
-import { createGoogleCalendarEvent } from "../services/google-calendar.service.js";
-import { sendPushToSubscribers } from "../controllers/notifications.controller.js";
 import { createAndSendNotification } from "../services/notify.service.js";
+import eventBus from "../events/eventBus.js";
+
+// ✅ Joi schema stays same
+const meetingSchema = Joi.object({
+  title: Joi.string().trim().min(3).max(100).required(),
+  description: Joi.string().allow("").max(500).optional(),
+  scheduledAt: Joi.date().iso().required(),
+  endsAt: Joi.date().iso().greater(Joi.ref("scheduledAt")).optional(),
+  participants: Joi.array()
+    .items(
+      Joi.object({
+        name: Joi.string().trim().required(),
+        email: Joi.string().email().required(),
+        id: Joi.number().optional(),
+      })
+    )
+    .optional()
+    .default([]),
+  creatorLocation: Joi.object({
+    lat: Joi.number().min(-90).max(90).required(),
+    lng: Joi.number().min(-180).max(180).required(),
+    placeName: Joi.string().allow("").optional(),
+  }).optional(),
+});
 
 export const createMeeting = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
+    // ✅ 1. Validate request body
+    const { error, value } = meetingSchema.validate(req.body, {
+      abortEarly: false,
+    });
+    if (error) {
+      return sendResponse(
+        res,
+        error.details.map((d) => d.message).join(", "),
+        400
+      );
+    }
+
     const {
       title,
       description,
       scheduledAt,
       endsAt,
-      participants = [],
+      participants,
       creatorLocation,
-    } = req.body;
-
-    if (!title || !scheduledAt) {
-      return sendResponse(res, "Title and scheduled time are required");
-    }
+    } = value;
 
     const { lat, lng, placeName } = creatorLocation || {};
     const creatorId = req.user?.id;
     const creatorEmail = req.user?.email;
 
-    const user = await User.findById(creatorId);
+    const user = await User.findById(creatorId).session(session);
     if (!user) {
+      await session.abortTransaction();
+      session.endSession();
       return sendResponse(res, "Unauthorized", 401);
     }
 
     const hostName = user?.name;
 
-    // 1. Create meeting document
+    // ✅ 2. Create meeting document inside transaction
     const meeting = new Meeting({
       title,
       description,
@@ -50,18 +89,17 @@ export const createMeeting = async (req, res) => {
       endsAt,
     });
 
-    // 2. Generate meeting link
     meeting.meetingLink = `${process.env.FRONTEND_URL}/meeting/${meeting._id}`;
-    await meeting.save();
+    await meeting.save({ session });
 
-    // 3. Prepare participants
+    // ✅ 3. Prepare participants
     const allParticipants = await Promise.all(
       participants
         .filter((p) => p.email !== creatorEmail)
         .map(async (p) => {
           let userId = null;
           if (p.email) {
-            const existingUser = await User.findOne({ email: p.email });
+            const existingUser = await User.findOne({ email: p.email }).session(session);
             if (existingUser) userId = existingUser._id;
           }
 
@@ -85,72 +123,47 @@ export const createMeeting = async (req, res) => {
       meeting: meeting._id,
     });
 
-    // const createdParticipants = await Participant.insertMany(allParticipants);
-    // meeting.participants = createdParticipants.map((p) => p._id);
-    // const updatedMeeting = await meeting.save();
-
+    // ✅ 4. Insert participants in transaction
     const createdParticipants = await Participant.insertMany(allParticipants, {
       ordered: false,
+      session,
     });
 
-    //avoids multiple round-trips, if we ignore save()
     await Meeting.updateOne(
       { _id: meeting._id },
       {
         $push: {
           participants: { $each: createdParticipants.map((p) => p._id) },
         },
-      }
-    );  
+      },
+      { session }
+    );
 
+    // ✅ 5. Commit DB transaction before external calls
+    await session.commitTransaction();
+    session.endSession();
 
-    // 4. Send email invitations
-    const html = sendInvitationEmailHtml({
-      title,
-      description,
+      // ✅ Emit event after transaction commit
+    eventBus.emit("meetingCreated", {
+      meeting,
+      participants: allParticipants,
+      creator: { id: creatorId, email: creatorEmail },
       hostName,
-      scheduledAt: new Date(scheduledAt).toLocaleString(),
-      meetingLink: meeting.meetingLink,
     });
-
-    sendMeetingInvitationMail({
-      to: creatorEmail,
-      cc: participants,
-      subject: `Meeting Invitation from ${hostName}`,
-      html,
-    }).catch((error) => {
-      console.error("Error sending meeting invitation:", error);
-    });
-
-    // 5. Google Calendar integration (only if user has Google tokens)
-    createGoogleCalendarEvent({
-      userId: creatorId,
-      title,
-      description,
-      scheduledAt,
-      endsAt,
-      creatorEmail,
-      participants,
-    });
-
-    // ✅ 6. Push notification to participants
-    const payload = {
-      title: "New Meeting Scheduled",
-      body: `Meeting "${title}" created by ${hostName}`,
-      url: meeting.meetingLink,
-    };
-
-    // Send push to all participant emails
-    const participantEmails = allParticipants.map((p) => p.email);
-    sendPushToSubscribers(payload, participantEmails);
-
-    return sendResponse(res, "Meeting created successfully", 201, {
-      meeting: payload,
+   
+return sendResponse(res, "Meeting created successfully", 201, {
+      meeting: {
+        title,
+        link: meeting.meetingLink,
+      },
     });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     return sendResponse(res, error.message, 500);
   }
 };
+
 
 export const getMeetings = async (req, res) => {
   try {
