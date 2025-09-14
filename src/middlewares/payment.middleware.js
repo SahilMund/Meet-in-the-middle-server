@@ -25,7 +25,7 @@ export const enforcePlanLimits = async (req, res, next) => {
       await subscription.save();
     }
 
-    const activePlan = PLANS[subscription.plan];
+    const activePlan = PLANS[subscription?.plan || "free"];
 
     // 1. Meeting count
     const meetingCount = await Meeting.countDocuments({ creator: user.id });

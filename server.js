@@ -15,6 +15,7 @@ import oAuth from "./src/configs/passport.js"; // initializes passport strategie
 
 import http from "http";
 
+// eslint-disable-next-line import/no-unresolved
 import { swaggerUi, swaggerSpec } from "./src/configs/swagger.js";
 import connectDB from "./src/configs/mongoose.js";
 import { logger } from "./src/middlewares/logger.js";
@@ -31,8 +32,8 @@ app.use("/api/stripe", webhookRoutes);
 
 // ---------- Core Middlewares ----------
 app.use(cookieParser());
-// app.use(express.json({ limit: "100kb" })); // limit payload size
-app.use(express.json());
+app.use(express.json({ limit: "100kb" })); // limit payload size
+// app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ---------- API Docs ----------
