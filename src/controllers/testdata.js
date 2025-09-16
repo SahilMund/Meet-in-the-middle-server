@@ -23,21 +23,10 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
       icon_background_color: "#FF9E67",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
       name: "Ohri's Uppu Telugu Kitchen",
       permanently_closed: true,
-      photos: [
-        {
-          height: 1200,
-          html_attributions: [
-            '<a href="https://maps.google.com/maps/contrib/102268465737800840918">Fareast @ Ohri&#39;s</a>',
-          ],
-          photo_reference:
-            "AciIO2evmEwzSYi-VmeZVFhMKqYMBcPVD8ZfV_ZIk_3Vnsyb7cnMMihPy3mZquEXpmeWKh_8nFt1Nf_PaSnDuQH06jP__G-cLphnKhj0_ImNsY934z2w3QG-4YeKE3DiW0bLBtIf0wVwhRhA11UxmgPBkDDljKG8LFmel1BWyae8GezLSV6OftJmXiEQmJj4AfoUyrq_cTmGi2sbJWAEoiTborvW47QDg93R6bbEUR7VbL2Ope0H7IRJ99-SlMaJIh3actHpq9GzZYHlcKm16KsKhaDuLGl0cD4kiVlHQwtyFjtMuVLJ1Dk8p5lCKFRXhEQ1v3gznz2ZDBo",
-          width: 1600,
-        },
-      ],
+      photos: ["https://wallpapercave.com/wp/wp1874184.jpg"],
       place_id: "ChIJicHMniSXyzsRy30pVpG9l7g",
       plus_code: {
         compound_code: "CC5Q+4V Hyderabad, Telangana, India",
@@ -72,23 +61,12 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/lodging-71.png",
       icon_background_color: "#909CE1",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/hotel_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/hotel_pinlet",
       name: "Ebony Boutique Hotel",
       opening_hours: {
         open_now: true,
       },
-      photos: [
-        {
-          height: 3000,
-          html_attributions: [
-            '<a href="https://maps.google.com/maps/contrib/112943030300043187746">Aman gupta</a>',
-          ],
-          photo_reference:
-            "AciIO2eao-NEE93HRkJ208fMnsNoyKM09Cfgh9t9D7P_ZgNCOH4F3AV66lgIYInWP-tTrvscsVJLFMD8fNVC80Ug_eeNAQ_rgcfslkpDcp__iHCYQEEItCBk52VjU_lpprbFws4MLFjgbVj8wAxniuXmolADB_y0rmDi-2bpZgYDwAsNdBb0Ra3490rJh_DeLNMAMYzMD5mLNhmblbxOGBEFsAYuGQqVnQ-AgLfIOFxpzT5hs8sgwrc7xkupzPIKi0H_KbJXQ9-U3XUlQqXNDZBvt1i3Hab_Tvq9wYZc0kMcZs3P8Gaq4kRaVhzv-n0E_VHI5Psoe9Gex9mFO62QRXXXNfSTBAEhrDNpvkLJMLdPvKOKjDkjSyrjOpVYFxQywm-ZBlIGVth_pJb0VLj0OBleT2MyfZEMOuP5L--xscIN4UWiDpr6dj8gSMQAcrs-xwzboUdaKF-YPNZDLyh41vTX5mMvYrAneVWLueIccqg21zJdx4C5u1LK-CV9zSrvADVq7eKpRZuHzPsLrjXiMFKJ-wmcrzZVNTN4hqVRFry76HuRWZCtyh4v4OQlKhfV62FLs0aEVyD5sOaN7sUoVRiLkV18sBlHZNjOq6YeKZbkoHmQUJ1zBuaRI5t2swVxgziIlQ3Y9w",
-          width: 4000,
-        },
-      ],
+      photos: ["https://wallpapercave.com/wp/wp1874184.jpg"],
       place_id: "ChIJFXqDuyyRyzsRi_dp7kIXk5M",
       plus_code: {
         compound_code: "CCGF+67 Hyderabad, Telangana, India",
@@ -97,17 +75,9 @@ export default {
       rating: 3.9,
       reference: "ChIJFXqDuyyRyzsRi_dp7kIXk5M",
       scope: "GOOGLE",
-      types: [
-        "lodging",
-        "cafe",
-        "restaurant",
-        "food",
-        "point_of_interest",
-        "establishment",
-      ],
+      types: ["lodging", "cafe", "restaurant", "food", "point_of_interest", "establishment"],
       user_ratings_total: 1610,
-      vicinity:
-        "8-2-120/C/98/1&2, Road #2, Annapoorna Studio Lane, Banjara Hills, Hyderabad",
+      vicinity: "8-2-120/C/98/1&2, Road #2, Annapoorna Studio Lane, Banjara Hills, Hyderabad",
     },
     {
       business_status: "OPERATIONAL",
@@ -129,23 +99,12 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/lodging-71.png",
       icon_background_color: "#909CE1",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/hotel_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/hotel_pinlet",
       name: "TreeInn Jubilee",
       opening_hours: {
         open_now: true,
       },
-      photos: [
-        {
-          height: 2084,
-          html_attributions: [
-            '<a href="https://maps.google.com/maps/contrib/102559634223106084526">Nagaraju Kalluri</a>',
-          ],
-          photo_reference:
-            "AciIO2cP0j1NQgIpgZhfodxYCzHZCRCigFgBAP2OPaPNZosCrXIFd6V0mdRxUt7KvCA3V1dGXaTrhOVrprBevAGswj3Wm0_lYr53uA5TyeybZqUA24BhH_53gG3Vw-zeD-NMZ38oQV0tJPzYvU_ktOagMU8OG_kY-UxNmYcohGYY97fs5Tbxtn_X9ZbVsQFs1GOz6D2LAyGqJwTQmOL8rlGZuFw-8ynfwgccat0IHB35Nolf--7ML83madiDUGGWzLSvmce0a3sRXj93tr6U5MmWWAwVqKOzi8iE3fmTAkSrxIjJmnrUs2b7PUqcBO3XVve86rU6i87t9GPZo_RuSICJnl_E31UBmokxVLbt_j2Sd2do0rxSKKKuzyhMgTbQRoYi0gmFu7SkqpvavyZmJYRR7RrHR3pGzj0lnv21YfuFwnfI6IVpxAmVC-BiXI3uxoGEp2PA5mWb49Qf8vHVFBXaNFSd_b_93mu9VlHRzpOWzWddyEm_BAj93nugRn7kAteF6y9FS_Sp8WTvqFXYVvJVn6WVhGxfAew_Dsi6prmF5hUeYFW6W3WCvBsP6J9WpORYGKmI97t9ng0SAyvJmZEKWuGu4Qk8tASkHl8Rel-RbkaUv6mrCSPeWCfa8ReGErDZ",
-          width: 4624,
-        },
-      ],
+      photos: ["https://wallpapercave.com/wp/wp1874184.jpg"],
       place_id: "ChIJ7aYbTYiRyzsRArm59teKfwg",
       plus_code: {
         compound_code: "CCG7+HM Hyderabad, Telangana, India",
@@ -187,23 +146,12 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
       icon_background_color: "#FF9E67",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
       name: "Shalimar Sweet",
       opening_hours: {
         open_now: true,
       },
-      photos: [
-        {
-          height: 1080,
-          html_attributions: [
-            '<a href="https://maps.google.com/maps/contrib/107529974359444301999">Naganathan Nagarajan</a>',
-          ],
-          photo_reference:
-            "AciIO2e04IOtE7lCUnGvBP0RFLSRMIDhwbgAO1CTcXQ_tVX16NHMbuuhcH7AG3NQ400tyXpg9A7lKLu9p-kQ2E6-gs2PqS6mCFnki6HUu-Jy6Z3IN5BniHHtaFoWUxaIye2329dGMOZVjt94oPnU0l8MRstfOKRT5u8KzCh5uA7CX43SMAhyxLZ8Idewf6nKn80x4SFXTGsElECLsgFCGLN0TKX1CXrB6A3VhaiVCcNVlfqxWHmnxundUUVSh8edXTEOqRfjwWycyUt-3gO3Y71oxbiFsXCnjO2D2mfNgqGvsHTJO0916UBKgnI-DjAK4a1g8cO8qnWjLuTN574kzzaO2VYNeZ_ebSOYDANAa1PgQvrnb4X4c7GHb-Pv3YNjKBXDv6PDF9QZGb8ouzsbTfUT5PzQoKMTCjQqKx1XmFH116X8T78N6OM5eiJZKsSzGfqKSWugGPx2JNxUuQdfG4g0U1qGRRW5hV1ZCkpCGvVqPRFWOt4F-zTTUmBiBIqmZYjo-A8NHyUrXYKY_xKhfd_nJhLsfEuOzeoMbH3hftbz_mnIqZEE7WNPvCHvxy5h77ZL908nIMeBlyQa3cvaFNU4kUZ5NI5Uh6tDGFUightwOMvZweUBIYiMV_bBDNgaipiG7jJS_Erq",
-          width: 1920,
-        },
-      ],
+      photos: ["https://wallpapercave.com/wp/wp1874184.jpg"],
       place_id: "ChIJzVl51x2XyzsRnS2OnSJ7IKQ",
       plus_code: {
         compound_code: "9CWJ+6V Hyderabad, Telangana, India",
@@ -215,8 +163,7 @@ export default {
       scope: "GOOGLE",
       types: ["restaurant", "food", "point_of_interest", "establishment"],
       user_ratings_total: 376,
-      vicinity:
-        "1, Mehdipatnam, 12-2-753/C, Masab Tank Road, P & T Colony, Mehdipatnam, Hyderabad",
+      vicinity: "1, Mehdipatnam, 12-2-753/C, Masab Tank Road, P & T Colony, Mehdipatnam, Hyderabad",
     },
     {
       business_status: "OPERATIONAL",
@@ -238,20 +185,10 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
       icon_background_color: "#FF9E67",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
       name: "My Choice Emirates",
-      photos: [
-        {
-          height: 4624,
-          html_attributions: [
-            '<a href="https://maps.google.com/maps/contrib/107608676290790025677">MUJTABA BIYABANI</a>',
-          ],
-          photo_reference:
-            "AciIO2fbqIPXWvxvYycRZJz8mXLMSdj3HUSI3DJbspX-Oq78qIy1_4pv-JGYh7isz_HVUN7j7T_II1U6mn8peOvxQPMG2kM7TnpSIOv1hzI_tDCP8YQDgjD7-uZm60Qmal-6xvFwnI_ruFtZ8A5p6uOh55VEtf49FVDH6Yvo0mKSORj0iD-hzo0IMRjWe0nffvYZ5x3JvSALPNL5fhwET1NP5kH4-o0n-RYs-XTeDLt75brCBk2vw7OlaVUJY23Q5ktm7sGtaZJNdAMFetg2weH8PM8foRoXBQcNINsgP_LWs8cmPyFN2bAwPQ8JltHxsXS-CccthrdyUzvlqaSz7AeBsZhzKwxX1T_gdmx78NVPEOtao56zmlZutA1m2PRsXTiay4V7DokzacW60FDbiZ3lXQ7ghjB9I1HV6b6e1lrmZHWE48-H0vILiZW9DK5FRH7pw_xsqDzRWemqX2glm0XOWF6EolTNswGWJbRAJZ9FhaoKgevFutlUWoJpJNLMxB6nV86TImrZZTrvfKWHrUoXQO5E_-cvrNUL8mSj3QN4QT7hIQt2aQZ-k1ruulHZsPoKKjZpl2gPaZ-rHTmWh3-Y2989vK5GLwVJRk3n6rM9JVo2hBshxPq_x3mNYTr5vyUTpCAy8FEx",
-          width: 2608,
-        },
-      ],
+
+      photos: ["https://www.bing.com/th/id/OIP.ET_GDP6-6UtLgiNo3kpI8QHaE7?w=244&h=211"],
       place_id: "ChIJ6-zmgZaWyzsRM3QvBfsD0b0",
       plus_code: {
         compound_code: "9CX3+F8 Hyderabad, Telangana, India",
@@ -285,8 +222,7 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
       icon_background_color: "#FF9E67",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
       name: "Mak’s Kitchen",
       opening_hours: {
         open_now: true,
@@ -336,8 +272,7 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
       icon_background_color: "#FF9E67",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
       name: "Hotel Kinara Grand",
       opening_hours: {
         open_now: true,
@@ -387,8 +322,7 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
       icon_background_color: "#FF9E67",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
       name: "Lavazza Veg Restaurant by the Fort",
       opening_hours: {
         open_now: true,
@@ -415,8 +349,7 @@ export default {
       scope: "GOOGLE",
       types: ["restaurant", "food", "point_of_interest", "establishment"],
       user_ratings_total: 16,
-      vicinity:
-        "Ground Floor, Ambience Fort, Attapur Mehdipatnam, Banjara Hills, Hyderabad",
+      vicinity: "Ground Floor, Ambience Fort, Attapur Mehdipatnam, Banjara Hills, Hyderabad",
     },
     {
       business_status: "OPERATIONAL",
@@ -438,8 +371,7 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
       icon_background_color: "#FF9E67",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
       name: "Nice Juice Centre",
       opening_hours: {
         open_now: true,
@@ -464,14 +396,7 @@ export default {
       rating: 4.2,
       reference: "ChIJ3Xz-6eaWyzsR9T3Bmzwwnd4",
       scope: "GOOGLE",
-      types: [
-        "meal_delivery",
-        "restaurant",
-        "food",
-        "point_of_interest",
-        "store",
-        "establishment",
-      ],
+      types: ["meal_delivery", "restaurant", "food", "point_of_interest", "store", "establishment"],
       user_ratings_total: 11559,
       vicinity: "H.No. 9, 4-86/4/3, Yousuf Tekri, Toli Chowki, Hyderabad",
     },
@@ -495,8 +420,7 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
       icon_background_color: "#FF9E67",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
       name: "Amer Scoops ice cream parlour and mohammedia shawarma",
       opening_hours: {
         open_now: true,
@@ -521,16 +445,9 @@ export default {
       rating: 3.4,
       reference: "ChIJvWBIH5WWyzsRpV9nQ1s8Zcw",
       scope: "GOOGLE",
-      types: [
-        "restaurant",
-        "food",
-        "point_of_interest",
-        "store",
-        "establishment",
-      ],
+      types: ["restaurant", "food", "point_of_interest", "store", "establishment"],
       user_ratings_total: 14,
-      vicinity:
-        "Golden palace Function Hall, 7 Tombs Road, Virat nagar, Toli Chowki, Hyderabad",
+      vicinity: "Golden palace Function Hall, 7 Tombs Road, Virat nagar, Toli Chowki, Hyderabad",
     },
     {
       business_status: "OPERATIONAL",
@@ -552,8 +469,7 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
       icon_background_color: "#FF9E67",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
       name: "Pista House Tolichowki",
       opening_hours: {
         open_now: true,
@@ -578,17 +494,9 @@ export default {
       rating: 4.6,
       reference: "ChIJkb1NjRCXyzsR3qnUdAZWi-0",
       scope: "GOOGLE",
-      types: [
-        "bakery",
-        "restaurant",
-        "food",
-        "point_of_interest",
-        "store",
-        "establishment",
-      ],
+      types: ["bakery", "restaurant", "food", "point_of_interest", "store", "establishment"],
       user_ratings_total: 22811,
-      vicinity:
-        "Shop.No.9, 4-77/3/A, Complex, Yousuf Tekri, Toli Chowki, Hyderabad",
+      vicinity: "Shop.No.9, 4-77/3/A, Complex, Yousuf Tekri, Toli Chowki, Hyderabad",
     },
     {
       business_status: "OPERATIONAL",
@@ -610,8 +518,7 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
       icon_background_color: "#FF9E67",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
       name: "Pizza Hut | Attapur, Hyderabad",
       opening_hours: {
         open_now: true,
@@ -668,8 +575,7 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
       icon_background_color: "#FF9E67",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
       name: "Siddique Kabab Centre",
       opening_hours: {
         open_now: true,
@@ -715,8 +621,7 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/shopping-71.png",
       icon_background_color: "#4B96F3",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/shopping_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/shopping_pinlet",
       name: "Al Ameen Meat Mart",
       opening_hours: {
         open_now: true,
@@ -740,13 +645,7 @@ export default {
       rating: 4.2,
       reference: "ChIJ1Yo815WWyzsRllaxvn5PZVM",
       scope: "GOOGLE",
-      types: [
-        "restaurant",
-        "food",
-        "point_of_interest",
-        "store",
-        "establishment",
-      ],
+      types: ["restaurant", "food", "point_of_interest", "store", "establishment"],
       user_ratings_total: 366,
       vicinity:
         "7a, 7 Tombs Road, Samatha Colony, Bentoubavdi, Samata Colony, Toli Chowki, Hyderabad",
@@ -771,8 +670,7 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
       icon_background_color: "#FF9E67",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
       name: "Domino's Pizza | Attapur Main Marg, Hyderabad",
       opening_hours: {
         open_now: true,
@@ -829,8 +727,7 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
       icon_background_color: "#FF9E67",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
       name: "Domino's Pizza | Tolichowki, Hyderabad",
       opening_hours: {
         open_now: true,
@@ -887,8 +784,7 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
       icon_background_color: "#FF9E67",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
       name: "AL Rabea AL Arabi Cafeteria",
       opening_hours: {
         open_now: true,
@@ -915,8 +811,7 @@ export default {
       scope: "GOOGLE",
       types: ["restaurant", "food", "point_of_interest", "establishment"],
       user_ratings_total: 8411,
-      vicinity:
-        "12-2-772, Dilshad Nagar Colony Road, Rethibowli, Mehdipatnam, Hyderabad",
+      vicinity: "12-2-772, Dilshad Nagar Colony Road, Rethibowli, Mehdipatnam, Hyderabad",
     },
     {
       business_status: "OPERATIONAL",
@@ -938,8 +833,7 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
       icon_background_color: "#FF9E67",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
       name: "Domino's Pizza | Hydershakote Village, Sun City",
       opening_hours: {
         open_now: true,
@@ -996,8 +890,7 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/shopping-71.png",
       icon_background_color: "#4B96F3",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/shopping_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/shopping_pinlet",
       name: "Meat Hub.in Nonveg Supermarket",
       opening_hours: {
         open_now: true,
@@ -1021,13 +914,7 @@ export default {
       rating: 4.1,
       reference: "ChIJTw9X_m-WyzsRNXB2thAMZsc",
       scope: "GOOGLE",
-      types: [
-        "restaurant",
-        "food",
-        "point_of_interest",
-        "store",
-        "establishment",
-      ],
+      types: ["restaurant", "food", "point_of_interest", "store", "establishment"],
       user_ratings_total: 275,
       vicinity: "Sun City, Bandlaguda Jagir",
     },
@@ -1051,8 +938,7 @@ export default {
       },
       icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/restaurant-71.png",
       icon_background_color: "#FF9E67",
-      icon_mask_base_uri:
-        "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
+      icon_mask_base_uri: "https://maps.gstatic.com/mapfiles/place_api/icons/v2/restaurant_pinlet",
       name: "H.K.G.N Tiffin Centere",
       permanently_closed: true,
       place_id: "ChIJuQUyzcaWyzsR66aqqruJknc",
@@ -1060,13 +946,7 @@ export default {
       rating: 3.2,
       reference: "ChIJuQUyzcaWyzsR66aqqruJknc",
       scope: "GOOGLE",
-      types: [
-        "restaurant",
-        "food",
-        "point_of_interest",
-        "store",
-        "establishment",
-      ],
+      types: ["restaurant", "food", "point_of_interest", "store", "establishment"],
       user_ratings_total: 11,
       vicinity: "CC46+C6W, Hakimpet, Hyderabad",
     },
