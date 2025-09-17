@@ -15,6 +15,10 @@ import {
 import { createGoogleCalendarEvent } from "../services/google-calendar.service.js";
 import { sendPushToSubscribers } from "../controllers/notifications.controller.js";
 import { createAndSendNotification } from "../services/notify.service.js";
+import { fork } from "child_process";
+import path from "path";
+import { v4 as uuidv4 } from "uuid";
+import { fileURLToPath } from "url";
 import SuggestedLocation from "../models/suggestedLocationModel.js";
 
 export const createMeeting = async (req, res) => {
@@ -104,6 +108,7 @@ export const createMeeting = async (req, res) => {
         },
       },
     );
+     
 
     // 4. Send email invitations
     const html = sendInvitationEmailHtml({
@@ -139,6 +144,7 @@ export const createMeeting = async (req, res) => {
       title: "New Meeting Scheduled",
       body: `Meeting "${title}" created by ${hostName}`,
       url: meeting.meetingLink,
+      meetingId: meeting._id,
     };
 
     // Send push to all participant emails
@@ -218,6 +224,7 @@ export const getPendingMeetings = async (req, res) => {
     const meetings = [
       ...new Map(
         myParticipations.filter((p) => p.meeting).map((p) => [p.meeting._id.toString(), p.meeting]),
+        myParticipations.filter((p) => p.meeting).map((p) => [p.meeting._id.toString(), p.meeting]),
       ).values(),
     ].map((m) => ({
       id: m._id,
@@ -256,6 +263,7 @@ export const deleteMeeting = async (req, res) => {
         p,
         "MEETING_DELETED",
         `Meeting "${meeting.title}" was cancelled by ${meeting.creator}`,
+        { meetingId },
         { meetingId },
       );
     }
@@ -372,6 +380,7 @@ export const acceptMeeting = async (req, res) => {
         "MEETING_ACCEPTED",
         `${participant.name} accepted your meeting "${participant.meeting.title}"`,
         { meetingId: meetingId },
+        { meetingId: meetingId },
       );
     }
 
@@ -406,6 +415,7 @@ export const rejectMeeting = async (req, res) => {
         participant.meeting.creator,
         "MEETING_REJECTED",
         `${participant.name} rejected your meeting "${participant.meeting.title}"`,
+        { meetingId },
         { meetingId },
       );
     }
@@ -471,6 +481,7 @@ export const dashboardStats = async (req, res) => {
     const myParticipations = await Participant.find({ email }).populate({
       path: "meeting",
       populate: [{ path: "creator", select: "name email" }, { path: "participants" }],
+      populate: [{ path: "creator", select: "name email" }, { path: "participants" }],
     });
     data.totalMeetings = myParticipations.length;
     let nv = Date.now();
@@ -487,6 +498,7 @@ export const dashboardStats = async (req, res) => {
     endOfWeek.setDate(endOfWeek.getDate() + 7);
 
     const currentWeekMeetingCount = myParticipations.filter(
+      (p) => p.meeting.scheduledAt >= startOfWeek && p.meeting.scheduledAt <= endOfWeek,
       (p) => p.meeting.scheduledAt >= startOfWeek && p.meeting.scheduledAt <= endOfWeek,
     );
     data.currentWeekMeetingCount = currentWeekMeetingCount.length;
@@ -519,6 +531,7 @@ export const upcomingMeetings = async (req, res) => {
       .populate({
         path: "meeting",
         match: { scheduledAt: { $gte: new Date() } },
+        populate: [{ path: "creator", select: "name email" }, { path: "participants" }],
         populate: [{ path: "creator", select: "name email" }, { path: "participants" }],
       });
     const upcomingParticipations = myParticipations.filter((p) => p.meeting !== null);
@@ -603,6 +616,7 @@ export const scheduleMeetingReminder = async (req, res) => {
 
     //filter participants
     const participants = meeting.participants.filter(
+      (p) => p.status === "Accepted" && p.user?.settings?.meetingsReminders === true,
       (p) => p.status === "Accepted" && p.user?.settings?.meetingsReminders === true,
     );
     const recipientEmails = participants.map((p) => p.user.email);
@@ -842,6 +856,68 @@ export const toggleLike = async (req, res) => {
     sendResponse(res, error.message, 500);
   }
 };
+
+export const generateReport = async (req, res) => {
+  try {
+    const userId = req.user && req.user.id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    // Fetch meetings for user
+    const meetings = await Meeting.find({
+      $or: [{ creator: userId }, { participants: userId }],
+    })
+      .populate("creator", "name email")
+      .populate("participants", "name email")
+      .lean();
+
+    if (!meetings || meetings.length === 0) {
+      return res.status(404).json({ message: "No meetings found for user" });
+    }
+
+    const jobId = uuidv4();
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    // Path to worker file
+    const workerPath = path.resolve(__dirname, "../workers/reportWorker.js");
+
+    // fork new child process
+    const worker = fork(workerPath, [], {
+      env: process.env,
+      stdio: ["inherit", "inherit", "inherit", "ipc"],
+    });
+
+    // Send payload to worker
+    worker.send({
+      jobId,
+      email: req.user.email,
+      meetings,
+    });
+
+    // Listen for messages
+    worker.on("message", (msg) => {
+      console.log("Report worker message:", msg);
+    });
+
+    worker.on("exit", (code) => {
+      console.log(`Report worker (job ${jobId}) exited with code ${code}`);
+    });
+
+    worker.on("error", (err) => {
+      console.error("Report worker error:", err);
+    });
+
+    // Respond immediately
+    return res.status(202).json({
+      message: "Report generation started",
+      jobId,
+    });
+  } catch (err) {
+    console.error("generateReport error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const populateSugestedPlaces = async (req, res) => {
   const { meetingId } = req.params;
   const { places } = req.body;
@@ -856,18 +932,54 @@ export const populateSugestedPlaces = async (req, res) => {
     sendResponse(res, error.message, 500);
   }
 };
-// lat: { type: Number, default: null },
-//   lng: { type: Number, default: null },
-//   placeName: { type: String, default: null },
-//   voteCount: { type: Number, default: 0 }, // auto-increment when user votes
-//   voters: [
-//     {
-//       type: mongoose.Schema.Types.ObjectId,
-//       ref: "User", // reference to User collection
-//     },
-//   ], // ✅ keeps track of users who voted
-//   isFinalized: { type: Boolean, default: false },
-//   images: [{ type: String, default: null }],
-// });
-// const SuggestedLocation = mongoose.model("SuggestedLocation", suggestedLocationSchema);
-// export default SuggestedLocation;
+
+export const generateUserReport = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    // Fetch user data (exclude sensitive info)
+    const user = await User.findById(userId)
+      .select("name email createdAt updatedAt lastLogin role")
+      .lean();
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const jobId = uuidv4();
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    // Path to worker file (relative to project root)
+    const workerPath = path.resolve(__dirname, "../workers/userReportWorker.js");
+
+
+    const worker = fork(workerPath, [], {
+      env: process.env,
+      stdio: ["inherit", "inherit", "inherit", "ipc"],
+    });
+
+    worker.send({
+      jobId,
+      email: user.email,
+      user,
+    });
+
+    worker.on("message", (msg) => {
+      console.log("User report worker message:", msg);
+    });
+
+    worker.on("exit", (code) => {
+      console.log(`User report worker (job ${jobId}) exited with ${code}`);
+    });
+
+    return res.status(202).json({
+      message: "User report generation started",
+      jobId,
+    });
+  } catch (err) {
+    console.error("generateUserReport error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+

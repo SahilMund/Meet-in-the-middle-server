@@ -17,6 +17,8 @@ import {
   confirmationRemainder,
   calculateEquidistantPoint,
   nearByPlaces,
+  generateReport,
+  generateUserReport,
   suggestedPlaces,
   finalizedLocation,
   toggleLike,
@@ -44,8 +46,10 @@ router.get("/recentActivity", isLoggedIn, recentActivity);
 router.get("/scheduleMeetingReminder", isLoggedIn, scheduleMeetingReminder);
 router.get("/confirmationRemainder", isLoggedIn, confirmationRemainder);
 router.get("/calculateEquidistantPoint/:meetingId", isLoggedIn, calculateEquidistantPoint);
-router.get("/getNearByPlaces/:meetingId", isLoggedIn, nearByPlaces); //Done inst
+router.get("/getNearByPlaces/:meetingId", isLoggedIn, nearByPlaces);
 router.get("/suggestedPlaces/:meetingId", isLoggedIn, suggestedPlaces);
+router.get("/meetingReport", isLoggedIn, generateReport);
+router.get("/userReport", isLoggedIn, generateUserReport);
 router.post("/populatedSugestedPlaces/:meetingId", isLoggedIn, populateSugestedPlaces);
 router.put("/finalizedLocation/:meetingId", isLoggedIn, finalizedLocation);
 router.put("/toggleLikes/:suggestedPlacesId", isLoggedIn, toggleLike);
