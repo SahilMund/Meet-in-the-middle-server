@@ -797,7 +797,7 @@ export const suggestedPlaces = async (req, res) => {
       return sendResponse(res, "meeting not found", 400, null);
     }
     const suggestedPlaces = meeting.suggestedLocations;
-    return sendResponse(res, "success", 200, { suggestedPlaces });
+    return sendResponse(res, "successfully fetched ", 200, { suggestedPlaces });
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
@@ -831,31 +831,43 @@ export const finalizedLocation = async (req, res) => {
 export const toggleLike = async (req, res) => {
   try {
     const { suggestedPlacesId } = req.params;
-    const currentLocation = await SuggestedLocation.findById(suggestedPlacesId);
+    const userId = req.user.id;
 
-    if (!currentLocation) {
+    // Try to pull the user first (if they exist in voters)
+    const updated = await SuggestedLocation.findOneAndUpdate(
+      { _id: suggestedPlacesId, voters: userId }, // only if user already liked
+      {
+        $pull: { voters: userId },
+        $inc: { voteCount: -1 },
+      },
+      { new: true }
+    );
+
+    if (updated) {
+      return sendResponse(res, "Like removed", 200, updated);
+    }
+
+    // If not found above, then push user (means it's a new like)
+    const liked = await SuggestedLocation.findByIdAndUpdate(
+      suggestedPlacesId,
+      {
+        $addToSet: { voters: userId }, // avoid duplicates
+        $inc: { voteCount: 1 },
+      },
+      { new: true }
+    );
+
+    if (!liked) {
       return sendResponse(res, "Suggested Location not found", 400, null);
     }
-    if (currentLocation.voters.includes(req.user.id)) {
-      await SuggestedLocation.findByIdAndUpdate(
-        suggestedPlacesId,
-        {
-          $pull: { voters: req.user.id }, // remove user from voters array
-          $inc: { voteCount: -1 }, // decrement voteCount by 1
-        },
-        { new: true }, // optional: returns updated doc
-      );
-    } else {
-      await SuggestedLocation.findByIdAndUpdate(suggestedPlacesId, {
-        $push: { voters: req.user.id },
-        $inc: { voteCount: 1 },
-      });
-    }
-    return sendResponse(res, "Like Updated Successfully", 200);
+
+    return sendResponse(res, "Like added", 200, liked);
   } catch (error) {
+    console.error("toggleLike error:", error);
     sendResponse(res, error.message, 500);
   }
 };
+
 
 export const generateReport = async (req, res) => {
   try {
@@ -921,13 +933,17 @@ export const generateReport = async (req, res) => {
 export const populateSugestedPlaces = async (req, res) => {
   const { meetingId } = req.params;
   const { places } = req.body;
+  console.log({places})
   try {
-    await Promise.all(
+    const suggestions = await Promise.all(
       places.map((e) => {
         return SuggestedLocation.create(e);
       }),
     );
-    return sendResponse(res, "success", 200);
+    await Meeting.findByIdAndUpdate(meetingId, {
+      $push: { suggestedLocations: { $each: suggestions.map((s) => s._id) } },
+    });
+    return sendResponse(res, "successfully updated places", 200);
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
