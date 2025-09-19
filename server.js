@@ -1,17 +1,17 @@
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import webhookRoutes from "./src/routes/webhook.route.js"; // 👈 new
+// import webhookRoutes from "./src/routes/webhook.route.js"; // 👈 new
 
 dotenv.config({ quiet: true });
 
 // app.js or server.js
-import eventBus from "./src/events/eventBus.js";
-import registerMeetingListeners from "./src/events/MeetingListeners.js";
+// import eventBus from "./src/events/eventBus.js";
+// import registerMeetingListeners from "./src/events/MeetingListeners.js";
 
 
 import express from "express";
 import passport from "passport";
-import oAuth from "./src/configs/passport.js"; // initializes passport strategies
+// import oAuth from "./src/configs/passport.js"; // initializes passport strategies
 
 import http from "http";
 
@@ -25,10 +25,12 @@ import routes from "./src/routes/index.js";
 
 import { initSocket } from "./src/configs/socket.js";
 
+import cors from "cors";
+
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-app.use("/api/stripe", webhookRoutes);
+// app.use("/api/stripe", webhookRoutes);
 
 // ---------- Core Middlewares ----------
 app.use(cookieParser());
@@ -48,10 +50,19 @@ app.use(logger);
 
 // ---------- event listeners ----------
 
-registerMeetingListeners(eventBus);
+// registerMeetingListeners(eventBus);
 
 // ---------- Passport ----------
 app.use(passport.initialize());
+app.use(
+  cors({
+    // origin: "*",
+    origin: process.env.FRONTEND_URL,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+)
 
 // ---------- Health Check ----------
 app.get("/", (req, res) => {

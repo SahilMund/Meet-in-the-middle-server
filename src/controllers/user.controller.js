@@ -76,7 +76,7 @@ export const login = async (req, res) => {
   const { email, password, rememberMe } = req.body;
   try {
     const user = await User.findOne({ email });
-    console.log("the user", user);
+    // console.log("the user", user);
     if (!user || !(await user.comparePassword(password))) {
       return sendResponse(res, "Invalid credentials", 401);
     }
@@ -138,6 +138,7 @@ export const login = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       maxAge: rememberMe ? toMs("2d") : toMs("4h"), // shorter if not remembered
     };
+    console.log("here")
 
     //refresh token
     const refreshToken = jwt.sign(
