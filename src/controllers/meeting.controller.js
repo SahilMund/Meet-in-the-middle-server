@@ -820,7 +820,7 @@ export const finalizedLocation = async (req, res) => {
     const highestVotedPlace = suggestedId || suggestedPlaces.reduce((acc, ele) => {
       return acc.voteCount >= ele.voteCount ? acc : ele;
     })._id;
-    meeting.finalizedLocation = highestVotedPlace;
+    meeting.finalLocation = highestVotedPlace;
     await meeting.save();
     const suggestedLocationIsUpdated = await SuggestedLocation.findByIdAndUpdate(
       highestVotedPlace,
