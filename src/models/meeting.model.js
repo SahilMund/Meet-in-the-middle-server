@@ -30,10 +30,10 @@ const meetingSchema = new mongoose.Schema(
     endsAt: {
       type: Date,
     },
-    locationSuggestion: {
-      // lat: { type: Number, default: null },
-      // lng: { type: Number, default: null },
-      // placeName: { type: String, default: null },
+    finalLocation: {
+      type: mongoose.Types.ObjectId,
+      ref: " SuggestedLocation",
+      default: null,
     },
     suggestedLocations: [
       {

@@ -20,6 +20,7 @@ import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { fileURLToPath } from "url";
 import SuggestedLocation from "../models/suggestedLocationModel.js";
+import { merchantapi_ordertracking_v1 } from "googleapis";
 
 export const createMeeting = async (req, res) => {
   try {
@@ -806,6 +807,7 @@ export const suggestedPlaces = async (req, res) => {
 export const finalizedLocation = async (req, res) => {
   try {
     const { meetingId } = req.params;
+    const {suggestedId} = req.body;
     const meeting = await Meeting.findById(meetingId)
       .populate("suggestedLocations") // ✅ correct populate
       .select("suggestedLocations"); // ✅ correct field
@@ -815,11 +817,13 @@ export const finalizedLocation = async (req, res) => {
 
     const suggestedPlaces = meeting.suggestedLocations;
     if (suggestedPlaces.length === 0) return sendResponse(res, "No Suggested Places", 202);
-    const highestVotedPlace = suggestedPlaces.reduce((acc, ele) => {
+    const highestVotedPlace = suggestedId || suggestedPlaces.reduce((acc, ele) => {
       return acc.voteCount >= ele.voteCount ? acc : ele;
-    });
+    })._id;
+    metting.finalizedLocation = highestVotedPlace;
+    await meeting.save();
     const suggestedLocationIsUpdated = await SuggestedLocation.findByIdAndUpdate(
-      highestVotedPlace._id,
+      highestVotedPlace,
       { isFinalized: true },
       { new: true },
     );
