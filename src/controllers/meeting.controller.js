@@ -821,13 +821,13 @@ export const finalizedLocation = async (req, res) => {
       return acc.voteCount >= ele.voteCount ? acc : ele;
     })._id;
     meeting.finalLocation = highestVotedPlace;
-    await meeting.save();
+    const nemeet = await meeting.save();
     const suggestedLocationIsUpdated = await SuggestedLocation.findByIdAndUpdate(
       highestVotedPlace,
       { isFinalized: true },
       { new: true },
     );
-    return sendResponse(res, "success", 200, { suggestedLocationIsUpdated });
+    return sendResponse(res, "successfully set location", 200, { suggestedLocationIsUpdated });
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
