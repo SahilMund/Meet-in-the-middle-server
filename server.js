@@ -1,17 +1,17 @@
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-// import webhookRoutes from "./src/routes/webhook.route.js"; // 👈 new
+import webhookRoutes from "./src/routes/webhook.route.js"; // 👈 new
 
 dotenv.config({ quiet: true });
 
 // app.js or server.js
-// import eventBus from "./src/events/eventBus.js";
-// import registerMeetingListeners from "./src/events/MeetingListeners.js";
+import eventBus from "./src/events/eventBus.js";
+import registerMeetingListeners from "./src/events/MeetingListeners.js";
 
 
 import express from "express";
 import passport from "passport";
-// import oAuth from "./src/configs/passport.js"; // initializes passport strategies
+import oAuth from "./src/configs/passport.js"; // initializes passport strategies
 
 import http from "http";
 
