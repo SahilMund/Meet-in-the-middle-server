@@ -31,10 +31,10 @@ const meetingSchema = new mongoose.Schema(
       type: Date,
     },
     finalLocation: {
-      type: mongoose.Types.ObjectId,
-      ref: " SuggestedLocation",
-      default: null,
-    },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SuggestedLocation",
+        default: null,
+      },
     suggestedLocations: [
       {
         type: mongoose.Schema.Types.ObjectId,
