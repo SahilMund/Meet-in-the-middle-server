@@ -16,7 +16,13 @@ import {
   scheduleMeetingReminder,
   confirmationRemainder,
   calculateEquidistantPoint,
-  nearByPlaces
+  nearByPlaces,
+  generateReport,
+  generateUserReport,
+  suggestedPlaces,
+  finalizedLocation,
+  toggleLike,
+  populateSugestedPlaces,
 } from "../controllers/meeting.controller.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
 import { enforcePlanLimits } from "../middlewares/payment.middleware.js";
@@ -43,4 +49,10 @@ router.get("/scheduleMeetingReminder", isLoggedIn, scheduleMeetingReminder);
 router.get("/confirmationRemainder", isLoggedIn, confirmationRemainder);
 router.get("/calculateEquidistantPoint/:meetingId", isLoggedIn, calculateEquidistantPoint);
 router.get("/getNearByPlaces/:meetingId", isLoggedIn, nearByPlaces);
+router.get("/suggestedPlaces/:meetingId", isLoggedIn, suggestedPlaces);
+router.get("/meetingReport", isLoggedIn, generateReport);
+router.get("/userReport", isLoggedIn, generateUserReport);
+router.post("/populatedSugestedPlaces/:meetingId", isLoggedIn, populateSugestedPlaces);
+router.put("/finalizedLocation/:meetingId", isLoggedIn, finalizedLocation);
+router.put("/toggleLikes/:suggestedPlacesId", isLoggedIn, toggleLike);
 export default router;

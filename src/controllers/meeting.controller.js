@@ -9,6 +9,7 @@ import sendInvitationEmailHtml from "../emailTemplates/meetingInvitation.js";
 import Meeting from "../models/meeting.model.js";
 import Participant from "../models/participant.model.js";
 import User from "../models/user.model.js";
+import testData from "./testdata.js";
 import sendResponse from "../utils/response.util.js";
 import {
   scheduleConfirmationRemainder,
@@ -16,6 +17,13 @@ import {
   sendMeetingInvitationMail,
 } from "../utils/sendMail.util.js";
 import { createAndSendNotification } from "../services/notify.service.js";
+import { fork } from "child_process";
+import path from "path";
+// eslint-disable-next-line import/no-unresolved
+import { v4 as uuidv4 } from "uuid";
+import { fileURLToPath } from "url";
+import SuggestedLocation from "../models/suggestedLocationModel.js";
+import { merchantapi_ordertracking_v1 } from "googleapis";
 import eventBus from "../events/eventBus.js";
 
 // ✅ Joi schema stays same
@@ -110,7 +118,7 @@ export const createMeeting = async (req, res) => {
             status: "Pending",
             meeting: meeting._id,
           };
-        })
+        }),
     );
 
     // Add creator as participant
@@ -229,9 +237,8 @@ export const getPendingMeetings = async (req, res) => {
 
     const meetings = [
       ...new Map(
-        myParticipations
-          .filter((p) => p.meeting)
-          .map((p) => [p.meeting._id.toString(), p.meeting])
+        myParticipations.filter((p) => p.meeting).map((p) => [p.meeting._id.toString(), p.meeting]),
+        // myParticipations.filter((p) => p.meeting).map((p) => [p.meeting._id.toString(), p.meeting]),
       ).values(),
     ].map((m) => ({
       id: m._id,
@@ -270,7 +277,7 @@ export const deleteMeeting = async (req, res) => {
         p,
         "MEETING_DELETED",
         `Meeting "${meeting.title}" was cancelled by ${meeting.creator}`,
-        { meetingId }
+        { meetingId },
       );
     }
 
@@ -302,9 +309,7 @@ export const getMeetingById = async (req, res) => {
   try {
     const { meetingId } = req.params;
 
-    const meeting = await Meeting.findById(meetingId)
-      .populate("creator")
-      .populate("participants");
+    const meeting = await Meeting.findById(meetingId).populate("creator").populate("participants");
 
     if (!meeting) {
       return sendResponse(res, "Meeting not found", 404);
@@ -387,7 +392,7 @@ export const acceptMeeting = async (req, res) => {
         participant.meeting.creator,
         "MEETING_ACCEPTED",
         `${participant.name} accepted your meeting "${participant.meeting.title}"`,
-        { meetingId: meetingId }
+        { meetingId: meetingId },
       );
     }
 
@@ -422,7 +427,7 @@ export const rejectMeeting = async (req, res) => {
         participant.meeting.creator,
         "MEETING_REJECTED",
         `${participant.name} rejected your meeting "${participant.meeting.title}"`,
-        { meetingId }
+        { meetingId },
       );
     }
 
@@ -486,21 +491,14 @@ export const dashboardStats = async (req, res) => {
     };
     const myParticipations = await Participant.find({ email }).populate({
       path: "meeting",
-      populate: [
-        { path: "creator", select: "name email" },
-        { path: "participants" },
-      ],
+      populate: [{ path: "creator", select: "name email" }, { path: "participants" }],
     });
     data.totalMeetings = myParticipations.length;
     let nv = Date.now();
-    const upcomingmeetings = myParticipations.filter(
-      (p) => p.meeting.scheduledAt > nv
-    );
+    const upcomingmeetings = myParticipations.filter((p) => p.meeting.scheduledAt > nv);
     data.upcomingmeetings = upcomingmeetings.length;
 
-    const pendingInvations = myParticipations.filter(
-      (p) => p.status === "Pending"
-    );
+    const pendingInvations = myParticipations.filter((p) => p.status === "Pending");
     data.pendingInvations = pendingInvations.length;
 
     const startOfWeek = new Date();
@@ -510,10 +508,7 @@ export const dashboardStats = async (req, res) => {
     endOfWeek.setDate(endOfWeek.getDate() + 7);
 
     const currentWeekMeetingCount = myParticipations.filter(
-      (p) =>
-        p.meeting.scheduledAt >= startOfWeek &&
-        p.meeting.scheduledAt <= endOfWeek
-    );
+      (p) => p.meeting.scheduledAt >= startOfWeek && p.meeting.scheduledAt <= endOfWeek    );
     data.currentWeekMeetingCount = currentWeekMeetingCount.length;
 
     if (myParticipations.length > 0) {
@@ -544,14 +539,10 @@ export const upcomingMeetings = async (req, res) => {
       .populate({
         path: "meeting",
         match: { scheduledAt: { $gte: new Date() } },
-        populate: [
-          { path: "creator", select: "name email" },
-          { path: "participants" },
-        ],
+        populate: [{ path: "creator", select: "name email" }, { path: "participants" }],
       });
-    const upcomingParticipations = myParticipations.filter(
-      (p) => p.meeting !== null
-    );
+    const upcomingParticipations = myParticipations.filter((p) => p.meeting !== null);
+   
     if (!myParticipations.length) {
       return sendResponse(res, "No Meetings found", 200, { meetings: [] });
     }
@@ -633,9 +624,7 @@ export const scheduleMeetingReminder = async (req, res) => {
 
     //filter participants
     const participants = meeting.participants.filter(
-      (p) =>
-        p.status === "Accepted" && p.user?.settings?.meetingsReminders === true
-    );
+      (p) => p.status === "Accepted" && p.user?.settings?.meetingsReminders === true    );
     const recipientEmails = participants.map((p) => p.user.email);
     const remainder1Day = new Date(startTime.getTime() - 24 * 60 * 60 * 1000);
     const remainder3Hours = new Date(startTime.getTime() - 3 * 60 * 60 * 1000);
@@ -643,7 +632,7 @@ export const scheduleMeetingReminder = async (req, res) => {
       await sendEmail(
         recipientEmails,
         `Reminder: Meeting "${meeting.title}" is tomorrow`,
-        `Hello, you have a meeting "${meeting.title}" scheduled by ${meeting.creator.name} tomorrow.The meeting Link ${meeting.meetingLink}`
+        `Hello, you have a meeting "${meeting.title}" scheduled by ${meeting.creator.name} tomorrow.The meeting Link ${meeting.meetingLink}`,
       );
     });
 
@@ -651,7 +640,7 @@ export const scheduleMeetingReminder = async (req, res) => {
       await sendEmail(
         recipientEmails,
         `Reminder: Meeting "${meeting.title}" starts in 3 hours`,
-        `Hello, your meeting "${meeting.title}" scheduled by ${meeting.creator.name} will start in 3 hours.The meeting Link ${meeting.meetingLink}`
+        `Hello, your meeting "${meeting.title}" scheduled by ${meeting.creator.name} will start in 3 hours.The meeting Link ${meeting.meetingLink}`,
       );
     });
     return sendResponse(res, "remainders scheduled successfully", 200, {
@@ -688,8 +677,7 @@ export const confirmationRemainder = async (req, res) => {
 
     //filter participants
     const participants = meeting.participants.filter(
-      (p) =>
-        p.status === "Pending" && p.user?.settings?.meetingsReminders === true
+      (p) => p.status === "Pending" && p.user?.settings?.meetingsReminders === true,
     );
     await scheduleConfirmationRemainder(meeting, participants, startTime);
   } catch (error) {
@@ -699,27 +687,18 @@ export const confirmationRemainder = async (req, res) => {
 export const calculateEquidistantPoint = async (req, res) => {
   try {
     const { meetingId } = req.params;
-    const meeting = await Meeting.findById(meetingId).populate(
-      "participants",
-      "location status"
-    );
+    const meeting = await Meeting.findById(meetingId).populate("participants", "location status");
     if (!meeting) {
       return sendResponse(res, "meeting not found", 400, null);
     }
     const acceptedParticipants = meeting.participants.filter(
-      (p) => p.status === "Accepted" && p.location?.lat && p.location?.lng
+      (p) => p.status === "Accepted" && p.location?.lat && p.location?.lng,
     );
     if (acceptedParticipants.length < 2) {
       return sendResponse(res, "No accepted participants with location", 400);
     }
-    const totalLat = acceptedParticipants.reduce(
-      (sum, p) => sum + p.location.lat,
-      0
-    );
-    const totalLng = acceptedParticipants.reduce(
-      (sum, p) => sum + p.location.lng,
-      0
-    );
+    const totalLat = acceptedParticipants.reduce((sum, p) => sum + p.location.lat, 0);
+    const totalLng = acceptedParticipants.reduce((sum, p) => sum + p.location.lng, 0);
     const equidistantPoint = {
       lat: totalLat / acceptedParticipants.length,
       lng: totalLng / acceptedParticipants.length,
@@ -735,15 +714,13 @@ export const acceptedParticipantsLocations = async (req, res) => {
     const { meetingId } = req.params;
     const meeting = await Meeting.findById(meetingId).populate(
       "participants",
-      "location status name email"
+      "location status name email",
     );
     if (!meeting) {
       return sendResponse(res, "meeting not found", 400, null);
     }
     const locations = meeting.participants
-      .filter(
-        (p) => p.status === "Accepted" && p.location?.lat && p.location?.lng
-      )
+      .filter((p) => p.status === "Accepted" && p.location?.lat && p.location?.lng)
       .map((p) => ({
         name: p.name,
         email: p.email,
@@ -761,27 +738,24 @@ export const nearByPlaces = async (req, res) => {
   try {
     const { meetingId } = req.params;
     const { type } = req.query;
-    const meeting = await Meeting.findById(meetingId).populate(
-      "participants",
-      "location status"
-    );
+    let types = [];
+    if (Array.isArray(type)) {
+      types = type;
+    } else if (typeof type === "string") {
+      types = type.split(",");
+    }
+    const meeting = await Meeting.findById(meetingId).populate("participants", "location status");
     if (!meeting) {
       return sendResponse(res, "meeting not found", 400, null);
     }
     const acceptedParticipants = meeting.participants.filter(
-      (p) => p.status === "Accepted" && p.location?.lat && p.location?.lng
+      (p) => p.status === "Accepted" && p.location?.lat && p.location?.lng,
     );
     if (acceptedParticipants.length < 2) {
       return sendResponse(res, "No accepted participants with location", 400);
     }
-    const totalLat = acceptedParticipants.reduce(
-      (sum, p) => sum + p.location.lat,
-      0
-    );
-    const totalLng = acceptedParticipants.reduce(
-      (sum, p) => sum + p.location.lng,
-      0
-    );
+    const totalLat = acceptedParticipants.reduce((sum, p) => sum + p.location.lat, 0);
+    const totalLng = acceptedParticipants.reduce((sum, p) => sum + p.location.lng, 0);
     const equidistantPoint = {
       lat: totalLat / acceptedParticipants.length,
       lng: totalLng / acceptedParticipants.length,
@@ -789,36 +763,248 @@ export const nearByPlaces = async (req, res) => {
     //save equidistant point in meeting schema
     const apiKey = process.env.GOOGLE_PLACES_API_KEY;
     if (!apiKey) {
-      return sendResponse(
-        res,
-        "Google Places API key not configured",
-        500,
-        null
-      );
+      return sendResponse(res, "Google Places API key not configured", 500, null);
     }
     const radius = 5000; // 5 km radius
-    const placeType = type || "restaurant";
-    const googlePlacesUrl = `https://overpass-api.de/api/interpreter?data=[out:json];
-  node["amenity"="${placeType}"](around:${radius},${equidistantPoint.lat},${equidistantPoint.lng});
-  out;`;
-    // `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${equidistantPoint.lat},${equidistantPoint.lng}&radius=${radius}&type=${placeType}&key=${apiKey}`;
-    const response = await fetch(googlePlacesUrl);
-    const data = await response.json();
-    console.log(response);
-    if (response.status !== "OK") {
-      return sendResponse(res, "Error fetching nearby places", 500, null);
-    }
-    // const places = data.results.map((place) => ({
-    //   name: place.name,
-    //   address: place.vicinity,
-    //   location: place.geometry.location,
-    //   placeId: place.place_id,
-    //   rating: place.rating,
-    //   userRatingsTotal: place.user_ratings_total,
-    // }));
+    const placeType = types?.filter(Boolean).join("|");
+    const googlePlacesUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${equidistantPoint.lat},${equidistantPoint.lng}&radius=${radius}&keyword=${placeType}&key=${apiKey}`;
+    // const googlePlacesUrl = https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${equidistantPoint.lat},${equidistantPoint.lng}&radius=${radius}&type=${placeType}&key=${apiKey};
+    //https://overpass-api.de/api/interpreter?data=[out:json];node["amenity"="${placeType}"](around:${radius},${equidistantPoint.lat},${equidistantPoint.lng});out;;
+    // const response = await fetch(googlePlacesUrl);
+    // const data = await response.json();
+    const data = testData.results.slice(0, 5);
+
+    // if (data.status !== "OK") {
+    //   return sendResponse(res, "Error fetching nearby placess", 500, null);
+    // }     //uncomment after testing
+    const places = data.map((place) => ({
+      name: place.name,
+      address: place.vicinity,
+      location: place.geometry.location,
+      placeId: place.place_id,
+      rating: place.rating,
+      photos: place.photos,
+      userRatingsTotal: place.user_ratings_total,
+    }));
     //save places in meeting schema
-    return sendResponse(res, "success", 200, { places: data });
+    return sendResponse(res, "success", 200, { places });
   } catch (error) {
     sendResponse(res, error.message, 500);
   }
 };
+
+export const suggestedPlaces = async (req, res) => {
+  try {
+    const { meetingId } = req.params;
+    const meeting = await Meeting.findById(meetingId)
+      .populate("suggestedLocations") // ✅ correct populate
+      .select("suggestedLocations"); // ✅ correct field
+    if (!meeting) {
+      return sendResponse(res, "meeting not found", 400, null);
+    }
+    const suggestedPlaces = meeting.suggestedLocations;
+    return sendResponse(res, "successfully fetched ", 200, { suggestedPlaces });
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+
+export const finalizedLocation = async (req, res) => {
+  try {
+    const { meetingId } = req.params;
+    const {suggestedId} = req.body;
+    const meeting = await Meeting.findById(meetingId)
+      .populate("suggestedLocations") // ✅ correct populate
+      .select("suggestedLocations"); // ✅ correct field
+    if (!meeting) {
+      return sendResponse(res, "meeting not found", 400, null);
+    }
+
+    const suggestedPlaces = meeting.suggestedLocations;
+    if (suggestedPlaces.length === 0) return sendResponse(res, "No Suggested Places", 202);
+    const highestVotedPlace = suggestedId || suggestedPlaces.reduce((acc, ele) => {
+      return acc.voteCount >= ele.voteCount ? acc : ele;
+    })._id;
+    meeting.finalLocation = highestVotedPlace;
+    const nemeet = await meeting.save();
+    const suggestedLocationIsUpdated = await SuggestedLocation.findByIdAndUpdate(
+      highestVotedPlace,
+      { isFinalized: true },
+      { new: true },
+    );
+    return sendResponse(res, "successfully set location", 200, { suggestedLocationIsUpdated });
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+export const toggleLike = async (req, res) => {
+  try {
+    const { suggestedPlacesId } = req.params;
+    const userId = req.user.id;
+
+    // Try to pull the user first (if they exist in voters)
+    const updated = await SuggestedLocation.findOneAndUpdate(
+      { _id: suggestedPlacesId, voters: userId }, // only if user already liked
+      {
+        $pull: { voters: userId },
+        $inc: { voteCount: -1 },
+      },
+      { new: true }
+    );
+
+    if (updated) {
+      return sendResponse(res, "Like removed", 200, updated);
+    }
+
+    // If not found above, then push user (means it's a new like)
+    const liked = await SuggestedLocation.findByIdAndUpdate(
+      suggestedPlacesId,
+      {
+        $addToSet: { voters: userId }, // avoid duplicates
+        $inc: { voteCount: 1 },
+      },
+      { new: true }
+    );
+
+    if (!liked) {
+      return sendResponse(res, "Suggested Location not found", 400, null);
+    }
+
+    return sendResponse(res, "Like added", 200, liked);
+  } catch (error) {
+    console.error("toggleLike error:", error);
+    sendResponse(res, error.message, 500);
+  }
+};
+
+
+export const generateReport = async (req, res) => {
+  try {
+    const userId = req.user && req.user.id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    // Fetch meetings for user
+    const meetings = await Meeting.find({
+      $or: [{ creator: userId }, { participants: userId }],
+    })
+      .populate("creator", "name email")
+      .populate("participants", "name email")
+      .lean();
+
+    if (!meetings || meetings.length === 0) {
+      return res.status(404).json({ message: "No meetings found for user" });
+    }
+
+    const jobId = uuidv4();
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    // Path to worker file
+    const workerPath = path.resolve(__dirname, "../workers/reportWorker.js");
+
+    // fork new child process
+    const worker = fork(workerPath, [], {
+      env: process.env,
+      stdio: ["inherit", "inherit", "inherit", "ipc"],
+    });
+
+    // Send payload to worker
+    worker.send({
+      jobId,
+      email: req.user.email,
+      meetings,
+    });
+
+    // Listen for messages
+    worker.on("message", (msg) => {
+      console.log("Report worker message:", msg);
+    });
+
+    worker.on("exit", (code) => {
+      console.log(`Report worker (job ${jobId}) exited with code ${code}`);
+    });
+
+    worker.on("error", (err) => {
+      console.error("Report worker error:", err);
+    });
+
+    // Respond immediately
+    return res.status(202).json({
+      message: "Report generation started",
+      jobId,
+    });
+  } catch (err) {
+    console.error("generateReport error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const populateSugestedPlaces = async (req, res) => {
+  const { meetingId } = req.params;
+  const { places } = req.body;
+  console.log({places})
+  try {
+    const suggestions = await Promise.all(
+      places.map((e) => {
+        return SuggestedLocation.create(e);
+      }),
+    );
+    await Meeting.findByIdAndUpdate(meetingId, {
+      $push: { suggestedLocations: { $each: suggestions.map((s) => s._id) } },
+    });
+    return sendResponse(res, "successfully updated places", 200);
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+
+export const generateUserReport = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    // Fetch user data (exclude sensitive info)
+    const user = await User.findById(userId)
+      .select("name email createdAt updatedAt lastLogin role")
+      .lean();
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const jobId = uuidv4();
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    // Path to worker file (relative to project root)
+    const workerPath = path.resolve(__dirname, "../workers/userReportWorker.js");
+
+
+    const worker = fork(workerPath, [], {
+      env: process.env,
+      stdio: ["inherit", "inherit", "inherit", "ipc"],
+    });
+
+    worker.send({
+      jobId,
+      email: user.email,
+      user,
+    });
+
+    worker.on("message", (msg) => {
+      console.log("User report worker message:", msg);
+    });
+
+    worker.on("exit", (code) => {
+      console.log(`User report worker (job ${jobId}) exited with ${code}`);
+    });
+
+    return res.status(202).json({
+      message: "User report generation started",
+      jobId,
+    });
+  } catch (err) {
+    console.error("generateUserReport error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
