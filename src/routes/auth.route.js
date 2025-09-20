@@ -3,33 +3,36 @@ import bcrypt from "bcrypt";
 import User from "../models/user.model.js";
 import crypto from "crypto";
 import { sendResetPasswordMail } from "../utils/sendMail.util.js";
+import sendResponse from "../utils/response.util.js";
+import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
 
 const router = express.Router();
 
-router.post("/forgot-password", async (req, res) => {
+router.post("/forgot-password",isLoggedIn, async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email } = req.user;
     const user = await User.findOne({ email });
-    console.log(user);
+    // console.log(user);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
+    
     // Generate token
     const token = crypto.randomBytes(32).toString("hex");
     user.resetToken = token;
     user.resetTokenExpire = Date.now() + 1000 * 60 * 15; // 15 min expiry
     await user.save();
-
+    
     // Create reset link
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+    console.log({email, resetLink})
     await sendResetPasswordMail(email, resetLink);
-
-    res.json({ message: "Reset password link sent to your email" });
+    sendResponse(res,"Reset password link sent to your email",200)
+    console.log("after")
+    
+    // res.json({ message:  });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    sendResponse(res,"Something went wrong",400)
   }
 });
 

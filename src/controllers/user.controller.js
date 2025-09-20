@@ -22,6 +22,8 @@ import { toMs } from "../utils/msConverter.util.js";
 import { magicLinkMail } from "../utils/nodemailerHtml.js";
 import { getDeviceInfo } from "../utils/deviceInfo.js";
 import newDeviceLoginTemplate from "../emailTemplates/newDeviceLoginTemplete.js";
+import Subscription from "../models/subscription.model.js";
+
 
 export const getUserInfo = async (req, res) => {
   // Assuming req.user is set by the isLoggedIn middleware
@@ -37,30 +39,44 @@ export const getUserInfo = async (req, res) => {
   // const user = await User.findOne({ email });
   // const Preferences = await Preferences.findOne({ userId: id });
 
-  const [user, preferences] = await Promise.all([
+  const [user, preferences, subscription] = await Promise.all([
     User.findOne({ email }).lean(),
     Preferences.findOne({ userId: id }).lean(),
+    Subscription.findOne({ user: id }).select(
+      "plan currentPeriodEnd status"
+    )
   ]);
 
-  // Return user information
-  return sendResponse(res, "User logged in Successfully", 200, {
-    email: user.email,
-    id: user._id,
-    role: user.role,
-    name: user.name,
-    avatar: user.avatar,
-    bio: user.bio,
+    return sendResponse(res, "User logged in Successfully", 200, {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+      name: user.name,
+      avatar: user.avatar,
+       bio: user.bio,
     phone: user.phone,
     location: user.location,
     Preferences: preferences,
-  });
+      subscription: subscription
+        ? {
+            plan: subscription.plan,
+            currentPeriodEnd: subscription.currentPeriodEnd,
+            status: subscription.status,
+          }
+        : {
+            plan: "free",
+            currentPeriodEnd: null,
+            status: "active",
+          },
+    });
+
 };
 
 export const login = async (req, res) => {
   const { email, password, rememberMe } = req.body;
   try {
     const user = await User.findOne({ email });
-    console.log("the user", user);
+    // console.log("the user", user);
     if (!user || !(await user.comparePassword(password))) {
       return sendResponse(res, "Invalid credentials", 401);
     }
@@ -122,6 +138,7 @@ export const login = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       maxAge: rememberMe ? toMs("2d") : toMs("4h"), // shorter if not remembered
     };
+    console.log("here")
 
     //refresh token
     const refreshToken = jwt.sign(
@@ -182,9 +199,11 @@ export const loggedInUserInfo = async (req, res) => {
       avatar: user.avatar,
     });
   } catch (error) {
+    console.error("Error fetching logged in user info:", error);
     return sendResponse(res, "Something went wrong", 500);
   }
 };
+
 
 //This is for user avatar upload new for first time
 export const uploadToDiskStorage = async (req, res) => {

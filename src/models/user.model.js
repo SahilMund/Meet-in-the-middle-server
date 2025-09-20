@@ -45,8 +45,8 @@ const userSchema = new mongoose.Schema(
       deletedAt: { type: Date, default: null },
       status: { type: Boolean, default: false },
     },
-    resetToken:{ type: String},
-    resetTokenExpire:{type:Date}
+    resetToken: { type: String },
+    resetTokenExpire: { type: Date }
   },
   { timestamps: true }
 );
