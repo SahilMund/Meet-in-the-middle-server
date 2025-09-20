@@ -1,15 +1,16 @@
 // workers/reportWorker.js
 import fs from "fs";
 import fsPromises from "fs/promises";
-import path from "path";
+import path, { dirname } from "path";
 import os from "os";
 import PDFDocument from "pdfkit";
 import ExcelJS from "exceljs";
 import archiver from "archiver";
 import { sendMail } from "../utils/sendMail.util.js"; // adjust path to mailer.js (relative)
+// eslint-disable-next-line import/no-unresolved
 import { v4 as uuidv4 } from "uuid";
 import { fileURLToPath } from "url";
-import { dirname } from "path";
+
 import fse from "fs-extra";
 
 /**

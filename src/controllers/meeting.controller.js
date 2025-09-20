@@ -19,6 +19,7 @@ import {
 import { createAndSendNotification } from "../services/notify.service.js";
 import { fork } from "child_process";
 import path from "path";
+// eslint-disable-next-line import/no-unresolved
 import { v4 as uuidv4 } from "uuid";
 import { fileURLToPath } from "url";
 import SuggestedLocation from "../models/suggestedLocationModel.js";
@@ -237,7 +238,7 @@ export const getPendingMeetings = async (req, res) => {
     const meetings = [
       ...new Map(
         myParticipations.filter((p) => p.meeting).map((p) => [p.meeting._id.toString(), p.meeting]),
-        myParticipations.filter((p) => p.meeting).map((p) => [p.meeting._id.toString(), p.meeting]),
+        // myParticipations.filter((p) => p.meeting).map((p) => [p.meeting._id.toString(), p.meeting]),
       ).values(),
     ].map((m) => ({
       id: m._id,
@@ -276,7 +277,6 @@ export const deleteMeeting = async (req, res) => {
         p,
         "MEETING_DELETED",
         `Meeting "${meeting.title}" was cancelled by ${meeting.creator}`,
-        { meetingId },
         { meetingId },
       );
     }
@@ -393,7 +393,6 @@ export const acceptMeeting = async (req, res) => {
         "MEETING_ACCEPTED",
         `${participant.name} accepted your meeting "${participant.meeting.title}"`,
         { meetingId: meetingId },
-        { meetingId: meetingId },
       );
     }
 
@@ -428,7 +427,6 @@ export const rejectMeeting = async (req, res) => {
         participant.meeting.creator,
         "MEETING_REJECTED",
         `${participant.name} rejected your meeting "${participant.meeting.title}"`,
-        { meetingId },
         { meetingId },
       );
     }
@@ -494,7 +492,6 @@ export const dashboardStats = async (req, res) => {
     const myParticipations = await Participant.find({ email }).populate({
       path: "meeting",
       populate: [{ path: "creator", select: "name email" }, { path: "participants" }],
-      populate: [{ path: "creator", select: "name email" }, { path: "participants" }],
     });
     data.totalMeetings = myParticipations.length;
     let nv = Date.now();
@@ -511,9 +508,7 @@ export const dashboardStats = async (req, res) => {
     endOfWeek.setDate(endOfWeek.getDate() + 7);
 
     const currentWeekMeetingCount = myParticipations.filter(
-      (p) => p.meeting.scheduledAt >= startOfWeek && p.meeting.scheduledAt <= endOfWeek,
-      (p) => p.meeting.scheduledAt >= startOfWeek && p.meeting.scheduledAt <= endOfWeek,
-    );
+      (p) => p.meeting.scheduledAt >= startOfWeek && p.meeting.scheduledAt <= endOfWeek    );
     data.currentWeekMeetingCount = currentWeekMeetingCount.length;
 
     if (myParticipations.length > 0) {
@@ -545,9 +540,9 @@ export const upcomingMeetings = async (req, res) => {
         path: "meeting",
         match: { scheduledAt: { $gte: new Date() } },
         populate: [{ path: "creator", select: "name email" }, { path: "participants" }],
-        populate: [{ path: "creator", select: "name email" }, { path: "participants" }],
       });
     const upcomingParticipations = myParticipations.filter((p) => p.meeting !== null);
+   
     if (!myParticipations.length) {
       return sendResponse(res, "No Meetings found", 200, { meetings: [] });
     }
@@ -629,9 +624,7 @@ export const scheduleMeetingReminder = async (req, res) => {
 
     //filter participants
     const participants = meeting.participants.filter(
-      (p) => p.status === "Accepted" && p.user?.settings?.meetingsReminders === true,
-      (p) => p.status === "Accepted" && p.user?.settings?.meetingsReminders === true,
-    );
+      (p) => p.status === "Accepted" && p.user?.settings?.meetingsReminders === true    );
     const recipientEmails = participants.map((p) => p.user.email);
     const remainder1Day = new Date(startTime.getTime() - 24 * 60 * 60 * 1000);
     const remainder3Hours = new Date(startTime.getTime() - 3 * 60 * 60 * 1000);
