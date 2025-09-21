@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+
 const meetingSchema = new mongoose.Schema(
   {
     title: {
@@ -29,34 +30,33 @@ const meetingSchema = new mongoose.Schema(
     endsAt: {
       type: Date,
     },
-    locationSuggestion: {
-      lat: { type: Number, default: null },
-      lng: { type: Number, default: null },
-      placeName: { type: String, default: null },
-    },
+    finalLocation: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SuggestedLocation",
+        default: null,
+      },
     suggestedLocations: [
       {
-        
-      }
-    ]
-
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SuggestedLocation",
+      },
+    ],
   },
   { timestamps: true },
 );
 
-// Meeting schema
+// 📌 Indexes
 meetingSchema.index({ creator: 1 });
-// 👉 Used in: "My Meetings" dashboard to fetch all meetings created by a user.
+// "My Meetings" dashboard (all meetings created by a user)
 
 meetingSchema.index({ scheduledAt: 1 });
-// 👉 Used in: Upcoming meetings reminders + calendar integrations.
-// Example: send reminders for meetings happening in the next hour.
+// Upcoming meeting reminders + calendar integrations
 
 meetingSchema.index({ participants: 1 });
-// 👉 Used in: Fetch all meetings where a user is a participant (dashboard, invites list).
+// Fetch all meetings where a user is a participant
 
 meetingSchema.index({ scheduledAt: 1, creator: 1 });
-// 👉 Used in: Analytics/dashboard filters like "Show my meetings for next 7 days".
+// Analytics/dashboard filters like "Show my meetings for next 7 days"
 
 const Meeting = mongoose.model("Meeting", meetingSchema);
 
