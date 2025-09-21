@@ -958,6 +958,38 @@ export const populateSugestedPlaces = async (req, res) => {
   }
 };
 
+export const reactCalendar = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    const meetings = await Meeting.find({ creator: userId })
+      .populate("creator", "name email")
+      .populate("participants", "name email");
+
+     const formattedMeetings = meetings.map((meeting) => ({
+      id: meeting._id,
+      title: meeting.title,
+      start: new Date(meeting.scheduledAt),
+      end: meeting.endsAt
+        ? new Date(meeting.endsAt)
+        : new Date(new Date(meeting.scheduledAt).getTime() + 60 * 60 * 1000),
+      allDay: false,
+      description: meeting.description,
+      meetingLink: meeting.meetingLink,
+      location: meeting.locationSuggestion?.placeName || "No location",
+    }));
+
+if (!meetings || meetings.length === 0) {
+  return res.json([]); 
+}
+
+  res.json({ success: true, data: formattedMeetings });
+  } catch (err) {
+    console.error("Error fetching meetings:", err);
+    res.status(500).json({ success: false, message: "Error fetching meetings", data: null });
+  }
+};
+
 export const generateUserReport = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -1006,5 +1038,4 @@ export const generateUserReport = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
