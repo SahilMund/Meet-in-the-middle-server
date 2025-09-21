@@ -16,9 +16,11 @@ import {
   scheduleMeetingReminder,
   confirmationRemainder,
   calculateEquidistantPoint,
-  nearByPlaces
+  nearByPlaces,
+  reactCalendar
 } from "../controllers/meeting.controller.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
+import Meeting from "../models/meeting.model.js";
 import { enforcePlanLimits } from "../middlewares/payment.middleware.js";
 const router = express.Router();
 
@@ -42,5 +44,7 @@ router.get("/recentActivity", isLoggedIn, recentActivity);
 router.get("/scheduleMeetingReminder", isLoggedIn, scheduleMeetingReminder);
 router.get("/confirmationRemainder", isLoggedIn, confirmationRemainder);
 router.get("/calculateEquidistantPoint/:meetingId", isLoggedIn, calculateEquidistantPoint);
-router.get("/getNearByPlaces/:meetingId", isLoggedIn, nearByPlaces);
+router.get("/getNearByPlaces/:meetingId", isLoggedIn, nearByPlaces); 
+router.get("/calendar",isLoggedIn, reactCalendar);
+
 export default router;
