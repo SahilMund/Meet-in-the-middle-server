@@ -30,7 +30,7 @@ import cors from "cors";
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-// app.use("/api/stripe", webhookRoutes);
+app.use("/api/stripe", webhookRoutes);
 
 // ---------- Core Middlewares ----------
 app.use(cookieParser());
@@ -50,7 +50,7 @@ app.use(logger);
 
 // ---------- event listeners ----------
 
-// registerMeetingListeners(eventBus);
+registerMeetingListeners(eventBus);
 
 // ---------- Passport ----------
 app.use(passport.initialize());
